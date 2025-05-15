@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=gpu_job
+#SBATCH -D .
+#SBATCH --output=mpi_%j.out
+#SBATCH --error=mpi_%j.err
+#SBATCH --ntasks=80
+#SBATCH --cpus-per-task=1
+#SBATCH --time=00:02:00
+#SBATCH --gres=gpu:4
+
+export SRUN_CPUS_PER_TASK=${SLURM_CPUS_PER_TASK}
+# Print some information about the job
+echo "Job ID: $SLURM_JOB_ID"
+echo "Node: $SLURMD_NODENAME"
+echo "Timestamp: $(date)"
+
+# Load any necessary modules
+# Adjust these based on your HPC setup
+module load singularity
+
+# Set paths
+CONTAINER_NAME="test_training.sif"
+
+
+# Run the container with GPU access
+echo "Running container with GPU access..."
+singularity run --nv ${CONTAINER_NAME}
+
+echo "Job completed at $(date)"
