@@ -1,20 +1,23 @@
 BootStrap: docker
-From: axolotlai/axolotl
+From: axolotlai/axolotl:main-20250519-py3.11-cu124-2.5.1
 
 %post
     apt update
     export GITHUB_PAT=$GITHUB_PAT
-    cd /gpfs/scratch
     git clone -b dev https://$GITHUB_PAT@github.com/eve-esa/eve-training.git
     pip install -r eve-training/requirements.txt
 
 
 %environment
     export WANDB_API_KEY=$WANDB_API_KEY
+    export WANDB_MODE=offline
     export WANDB_PROJECT=eve-ift
     export HF_TOKEN=$HF_TOKEN
     export SINGULARITY_BIND="/gpfs/scratch/ehpc190"
+    export HF_HOME=/gpfs/scratch/ehpc190/.cache/huggingface
+
 
 %runscript
+    cp -r eve-training /gpfs/scratch/ehpc190
     cd /gpfs/scratch/ehpc190
     accelerate launch -m axolotl.cli.train  eve-training/config/eve_sft/eve_sft_qa_esa_nasa_lora.yaml
