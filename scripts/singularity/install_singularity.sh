@@ -1,20 +1,24 @@
 sudo apt-get update && \
 sudo apt-get install -y build-essential \
-libseccomp-dev pkg-config squashfs-tools cryptsetup
+libseccomp-dev pkg-config squashfs-tools cryptsetup gperf
 
 sudo rm -r /usr/local/go
 
 export VERSION=1.13.15 OS=linux ARCH=amd64  # change this as you need
 
-wget -O /tmp/go${VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${VERSION}.${OS}-${ARCH}.tar.gz && \
-sudo tar -C /usr/local -xzf /tmp/go${VERSION}.${OS}-${ARCH}.tar.gz
+wget -O ./go${VERSION}.${OS}-${ARCH}.tar.gz https://dl.google.com/go/go${VERSION}.${OS}-${ARCH}.tar.gz && \
+sudo tar -C /usr/local -xzf ./go${VERSION}.${OS}-${ARCH}.tar.gz
+
+
+# Immediately export for current shell
+export GOPATH=${HOME}/go
+export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin
 
 echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
 echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
 source ~/.bashrc
 
 curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
-bash -s -- -b $(go env GOPATH)/bin v1.21.0
 
 mkdir -p ${GOPATH}/src/github.com/sylabs && \
 cd ${GOPATH}/src/github.com/sylabs && \
