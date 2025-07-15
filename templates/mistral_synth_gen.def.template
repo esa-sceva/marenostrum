@@ -13,6 +13,4 @@ From: ubuntu:18.04
     mkdir workspace
 
 %environment
-    # Environment variables will be injected here from .env file\
-
-l
+    # Environment variables will be injected here from .env file
