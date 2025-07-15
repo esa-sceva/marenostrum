@@ -1,13 +1,13 @@
 Bootstrap: docker
-From: ubuntu:18.04
+From: ubuntu:22.04
 
 %post
     apt update
     git clone -b dev https://github.com/eve-esa/mistral-synth-gen.git
-    pip install uv
     cd mistral-synth-gen
     pip install uv
     uv sync
+    uv pip install vllm --torch-backend=auto
 
     # Create workdir
     mkdir workspace

@@ -14,7 +14,7 @@ echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
 source ~/.bashrc
 
 curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh |
-sh -s -- -b $(go env GOPATH)/bin v1.21.0
+bash -s -- -b $(go env GOPATH)/bin v1.21.0
 
 mkdir -p ${GOPATH}/src/github.com/sylabs && \
 cd ${GOPATH}/src/github.com/sylabs && \
@@ -22,6 +22,17 @@ git clone https://github.com/sylabs/singularity.git && \
 cd singularity
 
 git checkout v3.6.3
+
+# Install libseccomp
+wget https://github.com/seccomp/libseccomp/releases/download/v2.6.0/libseccomp-2.6.0.tar.gz
+tar -xzf libseccomp-2.6.0.tar.gz && \
+cd libseccomp-2.6.0 && \
+./configure --prefix=/usr --disable-static && make
+
+make install
+
+# Move libseccomp.pc to pkgconfig directory
+cp libseccomp.pc  /home/linuxbrew/.linuxbrew/lib/pkgconfig
 
 cd ${GOPATH}/src/github.com/sylabs/singularity && \
 ./mconfig && \
