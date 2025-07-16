@@ -1,0 +1,30 @@
+Bootstrap: docker
+From: python:3.12
+
+%post
+    apt update
+    # apt install -y git python3.12 curl
+    apt install -y python3-pip
+    # Install uv
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    # Add uv to PATH
+    export PATH=/root/.local/bin:$PATH
+    # Install Rust
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    # Add Rust to PATH
+    export PATH="$HOME/.cargo/bin:$PATH"
+    python3 --version
+    git clone -b dev https://github.com/eve-esa/mistral-synth-gen.git
+    cd mistral-synth-gen
+    uv venv --python 3.12
+    uv sync
+    uv pip install vllm --torch-backend=auto
+
+    # Create workdir
+    mkdir workspace
+
+%environment
+    export PATH="/root/.local/bin:$PATH"
+    export PATH="$HOME/.cargo/bin:$PATH"
+    export SINGULARITY_BIND="/gpfs/project/<project_id>/satcom:/workspace"
+    export HF_HOME=/workspace/hf_cache
