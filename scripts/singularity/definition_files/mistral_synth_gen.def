@@ -15,8 +15,6 @@ From: python:3.12
     # Add Rust to PATH
     export PATH="$HOME/.cargo/bin:$PATH"
     python3 --version
-    git clone -b dev https://github.com/eve-esa/mistral-synth-gen.git
-    cd mistral-synth-gen
     uv venv --python 3.12
     uv sync
     uv pip install vllm --torch-backend=auto
