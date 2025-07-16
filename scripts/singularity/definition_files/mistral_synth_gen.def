@@ -2,6 +2,7 @@ Bootstrap: docker
 From: python:3.12
 
 %post
+    chmod 755 /root
     apt update
     # apt install -y git python3.12 curl
     apt install -y python3-pip
