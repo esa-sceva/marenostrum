@@ -6,7 +6,7 @@ Use `huggingface/download_hf_assets.py` to download huggingface assets. Follow t
 
 ```bash
 
-python scripts/huggingface/download_hf_assets.py --config_file scripts/huggingface/hf_resources.yaml
+python scripts/huggingface/download_hf_assets.py scripts/huggingface/hf_resources.yaml
 
 ```
 
