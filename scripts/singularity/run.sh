@@ -23,7 +23,7 @@ echo "vLLM server is ready!"
 
 export OPENAI_API_KEY="EMPTY"
 export OPENAI_BASE_URL="http://localhost:8000/v1/"
-export NLTK_DATA=$WORK_PATH/nltk
+export NLTK_DATA=$WORK_PATH/nltk # Set the NLTK data path
 
 
 sauceduchef process $WORK_PATH/single_hop_qa_w_bonus.yaml $WORK_PATH/out/qa
