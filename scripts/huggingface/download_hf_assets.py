@@ -48,7 +48,7 @@ def main(config_file: str):
         except Exception as e:
             print(f"   ⚠️ Failed: {e}")
 
-    print("\n✅ Done! Cache is in:", HF_CACHE_DIR)
+    print("\n✅ Done! Cache is in:", hf_cache_dir)
 
 if __name__ == "__main__":
     main()
