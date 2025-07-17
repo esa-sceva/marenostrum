@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=gpu_job
+#SBATCH --job-name=test_synth_gen
 #SBATCH -D .
-#SBATCH --output=mpi_%j.out
-#SBATCH --error=mpi_%j.err
-#SBATCH --ntasks=80
-#SBATCH --cpus-per-task=1
-#SBATCH --time=00:02:00
-#SBATCH --gres=gpu:4
+#SBATCH --output=slurm_out/mpi_%j.out
+#SBATCH --error=slurm_out/mpi_%j.err
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=20
+#SBATCH --time=00:15:00
+#SBATCH --gres=gpu:1
 
 export SRUN_CPUS_PER_TASK=${SLURM_CPUS_PER_TASK}
 # Print some information about the job
@@ -19,11 +19,11 @@ echo "Timestamp: $(date)"
 module load singularity
 
 # Set paths
-CONTAINER_NAME="test_training.sif"
+CONTAINER_NAME="container.sif"
 
 
 # Run the container with GPU access
 echo "Running container with GPU access..."
-singularity run --nv ${CONTAINER_NAME}
+singularity exec --nv ${CONTAINER_NAME} /bin/bash /gpfs/projects/<project_id>/myfolder/run.sh
 
 echo "Job completed at $(date)"

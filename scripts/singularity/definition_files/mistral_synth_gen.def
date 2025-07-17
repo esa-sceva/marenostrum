@@ -5,7 +5,7 @@ From: python:3.12
     chmod 755 /root
     apt update
     # apt install -y git python3.12 curl
-    apt install -y python3-pip
+    apt install -y python3-pip netcat
     # Install uv
     curl -LsSf https://astral.sh/uv/install.sh | sh
     # Add uv to PATH
@@ -20,7 +20,7 @@ From: python:3.12
     uv pip install vllm --torch-backend=auto
 
     # Create workdir
-    mkdir workspace
+    mkdir /workspace
 
 %environment
     export PATH="/root/.local/bin:$PATH"
