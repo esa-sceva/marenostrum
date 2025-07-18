@@ -1,4 +1,4 @@
-dataset
 pyyaml
 huggingface_hub
 click
+datasets

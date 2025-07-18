@@ -1,9 +1,25 @@
+#!/bin/bash
+
+
 source /mistral-synth-gen/.venv/bin/activate
 echo "Starting vLLM server for Llama-3.1-8B-Instruct..."
 
 WORK_PATH="/gpfs/projects/<project_id>/satcom"
 
-vllm serve  "$WORK_PATH/hf_cache/models/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659" --dtype bfloat16 --served-model-name "llama-3-8b" &
+
+# Get config path from first positional argument
+CONFIG_PATH="$1"
+
+if [[ -z "$CONFIG_PATH" ]]; then
+    echo "Error: config_path is required"
+    echo "Usage: ./run.sh /path/to/config.yaml"
+    exit 1
+fi
+
+echo "Starting vLLM server with config: $CONFIG_PATH"
+
+# Run vLLM with the provided config file
+vllm serve --config "$CONFIG_PATH"
 SERVER_PID=$!
 
 
