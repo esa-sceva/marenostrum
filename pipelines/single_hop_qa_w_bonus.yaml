@@ -1,5 +1,5 @@
 checkpoint_strategy: "steps"
-checkpoint_interval: 10
+checkpoint_interval: 500
 log_level: "INFO"
 detailed_progress_info: true
 steps:

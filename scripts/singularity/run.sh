@@ -1,27 +1,21 @@
 #!/bin/bash
 
-
-source /mistral-synth-gen/.venv/bin/activate
-echo "Starting vLLM server for Llama-3.1-8B-Instruct..."
-
-WORK_PATH="/gpfs/projects/<project_id>/satcom"
-
-
-# Get config path from first positional argument
 CONFIG_PATH="$1"
+PIPELINE="$2"
+OUTPUT_DIR="$3"
 
-if [[ -z "$CONFIG_PATH" ]]; then
-    echo "Error: config_path is required"
-    echo "Usage: ./run.sh /path/to/config.yaml"
+if [[ -z "$CONFIG_PATH" || -z "$PIPELINE" || -z "$OUTPUT_DIR" ]]; then
+    echo "Usage: ./run.sh <config_path> <pipeline> <output_dir>"
     exit 1
 fi
 
-echo "Starting vLLM server with config: $CONFIG_PATH"
+# Activate the virtual environment
+source /mistral-synth-gen/.venv/bin/activate
+echo "Starting vLLM server..."
 
-# Run vLLM with the provided config file
-vllm serve --config "$CONFIG_PATH"
+# Start the vLLM server with the provided config
+vllm serve --config "$CONFIG_PATH" &
 SERVER_PID=$!
-
 
 MAX_WAIT=300  # in seconds
 # Wait for the server to be ready using Python, with timeout
@@ -37,10 +31,38 @@ while ! python -c "import socket; s = socket.socket(); s.settimeout(1); s.connec
 done
 echo "vLLM server is ready!"
 
+# Set environment variables
 export OPENAI_API_KEY="EMPTY"
 export OPENAI_BASE_URL="http://localhost:8000/v1/"
-export NLTK_DATA=$WORK_PATH/nltk # Set the NLTK data path
+export NLTK_DATA="/gpfs/projects/<project_id>/myfolder/nltk"  # Optional: adapt to your setup
 
+# Run the sauceduchef pipeline with the given pipeline file and output dir
+# Time the pipeline execution
+START_TIME=$(date +%s)
 
-sauceduchef process $WORK_PATH/single_hop_qa_w_bonus.yaml $WORK_PATH/out/qa
+sauceduchef process "$PIPELINE" "$OUTPUT_DIR"
+
+END_TIME=$(date +%s)
+ELAPSED_TIME=$((END_TIME - START_TIME))
+echo "Total processing time: ${ELAPSED_TIME} seconds"
+
+# Extract input file path from the pipeline YAML
+INPUT_FILE=$(grep -E 'input_path:|path:' "$PIPELINE" | head -1 | awk '{print $2}' | tr -d '"')
+
+if [[ -f "$INPUT_FILE" ]]; then
+    NUM_DOCS=$(wc -l < "$INPUT_FILE")
+    AVG_TIME=$(echo "$ELAPSED_TIME / $NUM_DOCS" | bc -l)
+    THROUGHPUT=$(echo "$NUM_DOCS / $ELAPSED_TIME" | bc -l)
+
+    echo "Documents processed: $NUM_DOCS"
+    printf "Average time per document: %.3f seconds\n" "$AVG_TIME"
+    printf "Processing throughput: %.3f docs/sec\n" "$THROUGHPUT"
+else
+    echo "Warning: Cannot find input file at path '$INPUT_FILE' — skipping stats."
+fi
+
+# Clean up
+kill $SERVER_PID
+
+# Clean up
 kill $SERVER_PID
