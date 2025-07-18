@@ -1,0 +1,7 @@
+# config.yaml
+
+model: /gpfs/projects/<project_id>/myfolder/hf_cache/models/models--meta-llama--Llama-3.3-70B-Instruct/snapshots/6f6073b423013f6a7d4d9f39144961bfbfbc386b
+port: 8000
+uvicorn-log-level: "info"
+dtype: "bfloat16"
+served-model-name: "llama3.3-70B"

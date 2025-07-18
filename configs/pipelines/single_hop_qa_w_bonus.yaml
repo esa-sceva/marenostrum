@@ -49,7 +49,7 @@ steps:
     description: "Generate Q&A"
     run_params:
       show_progress: true
-      input_batch_size: 1
+      input_batch_size: 5
     params:
       temperature: 0.3
       max_tokens: 20000
@@ -77,6 +77,8 @@ steps:
 
   - method: Combine
     description: "Combine LLM out and input"
+    run_params:
+      input_batch_size: 5
     input:
       - llm_output
       - sample
@@ -87,6 +89,7 @@ steps:
     description: "Unpack each qa pair into a separate object"
     run_params:
       show_progress: true
+      input_batch_size: 5
     params:
       key: pairs
       replay_fields:
@@ -97,6 +100,7 @@ steps:
   - method: JSONLWriter
     description: "write output"
     run_params:
+      input_batch_size: 5
       show_progress: true
     params:
       path: "data/output_qa.jsonl"
