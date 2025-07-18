@@ -8,7 +8,7 @@ steps:
     run_params:
       show_progress: true
     params:
-      path: "dataset"
+      path: "dataset/test.jsonl"
     output: sample
 
 
@@ -52,7 +52,7 @@ steps:
       input_batch_size: 1
     params:
       temperature: 0.3
-      max_tokens: 10000
+      max_tokens: 20000
       response_model:
         pairs:
           - question: str
