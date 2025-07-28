@@ -5,3 +5,5 @@ port: 8000
 uvicorn-log-level: "info"
 dtype: "bfloat16"
 served-model-name: "llama3.3-70B"
+tensor-parallel-size: 4
+

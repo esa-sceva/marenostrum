@@ -1,21 +1,31 @@
 checkpoint_strategy: "steps"
-checkpoint_interval: 10
+checkpoint_interval: 50
 log_level: "INFO"
 detailed_progress_info: true
+
+constants:
+  gen_template: |-
+    You are an expert in Earth Observation. Your task is to carefully read the document provided and generate a set of clear, informative question-answer pairs based on its content.
+    
+    Each question should test understanding of a specific concept, fact, or process mentioned in the text. The answers must be accurate and concise, directly supported by the document.
+    
+    Focus on creating questions that cover a range of topics within the document and vary in type (e.g., factual, explanatory, comparative). Avoid trivial or overly vague questions.
+    
+    {bonus_instruction}
+    
+    Document starts here:
+  
+    {content}
+
 steps:
   - method: JSONLReader
     description: "read docs"
     run_params:
-      input_batch_size: 5
       show_progress: true
     params:
-      path: "dataset/test.jsonl"
+      path: "dataset/anonymized_sample_split_1.jsonl"
     output: sample
-
-
   - method: RandomChoice
-    run_params:
-      input_batch_size: 5
     params:
       choices:
         - "Questions should probe different aspects of the content, encouraging a variety of answers."
@@ -42,8 +52,6 @@ steps:
 
   - method: Combine
     description: "Combine LLM out and input"
-    run_params:
-      input_batch_size: 5
     input:
       - sample
       - bonus_instruction
@@ -54,59 +62,58 @@ steps:
     description: "Generate Q&A"
     run_params:
       show_progress: true
-      input_batch_size: 5
+      input_batch_size: 1
     params:
-      temperature: 0.3
-      max_tokens: 50000
-      response_model:
-        pairs:
-          - question: str
-            answer: str
-      model: "llama3.3-70B"
-      template: |
-        You are an expert in Earth Observation. Your task is to carefully read the document provided and generate a set of clear, informative question-answer pairs based on its content.
-        
-        Each question should test understanding of a specific concept, fact, or process mentioned in the text. The answers must be accurate and concise, directly supported by the document.
-        
-        Focus on creating questions that cover a range of topics within the document and vary in type (e.g., factual, explanatory, comparative). Avoid trivial or overly vague questions.
-        
-        {bonus_instruction}
-        
-        Document starts here:
-
-        {content}
+      chosen_model_field: "chosen_model"
+      models:
+        llama3.3-70B:
+          model: "llama3.3-70B"
+          temperature: 0.3
+          max_tokens: 30000
+          base_url: "http://localhost:8000/v1/"
+          api_key: 'EMPTY'
+          response_model:
+            pairs:
+            - question: str
+              answer: str
+          template: !ref gen_template
     input: sample_bonus
     output: llm_output
 
 
-
   - method: Combine
     description: "Combine LLM out and input"
-    run_params:
-      input_batch_size: 5
     input:
-      - llm_output
       - sample
+      - llm_output
     output: llm_out_sample
+
 
 
   - method: Unpack
     description: "Unpack each qa pair into a separate object"
     run_params:
       show_progress: true
-      input_batch_size: 5
+      input_batch_size: 1
     params:
       key: pairs
-      replay_fields:
-        - path
     input: llm_out_sample
-    output: unpacked
+    output: unpacked_llm_out
+
+
+  - method: ExpressionTransform
+    params:
+      remove:
+        - 'content'
+    input: unpacked_llm_out
+    output: llm_out_transformed
+
+
 
   - method: JSONLWriter
     description: "write output"
     run_params:
-      input_batch_size: 5
       show_progress: true
     params:
-      path: "data/output_qa.jsonl"
-    input: unpacked
+      path: "data/out_data.jsonl"
+    input: llm_out_transformed

@@ -22,10 +22,48 @@ To make a run follow the following steps:
 ```bash
 cd /gpfs/projects/<project_id>/satcom
 ```
-2. Run the slurm script changing the `qos` and the script `slurm_submission`
+2. Create a configuration file for setting up slurm directives and job-specific argument as this:
 ```bash
-sbatch -A, --account=ehpc190 -q, --qos=acc_debug slurm_submission 
+# SLURM directives
+JOB_NAME=test_synth_gen
+WORK_DIR=.
+OUT_FILE=slurm_out/mpi_%j.out
+ERR_FILE=slurm_out/mpi_%j.err
+NTASKS=2
+CPUS_PER_TASK=40 # 20 CPU for each GPU used
+TIME=00:50:00
+GRES=gpu:2       # Number of GPUs to use
+
+# SLURM submission options
+ACCOUNT=ehpc190
+QOS=acc_debug
+
+# Job-specific arguments
+VLLM_CONFIG=./configs/vllm_configs/mistral_small.yaml
+PIPELINE=./configs/pipelines/single_hop_qa_w_bonus.yaml
+OUTPUT_DIR=./out/single_hop_qa_w_bonus
 ```
-3. You will find the stderr and the stdout in the `slurm_out/<job_id>.[out/err]` file.
+3. Create a vLLM config file:
+```yaml
+# config.yaml
+
+model: /gpfs/projects/<project_id>/myfolder/hf_cache/models/models--mistralai--Mistral-Small-3.2-24B-Instruct-2506/snapshots/46a27874d7f7a7b38344124d32a7a3c4589d3b53
+port: 8000
+uvicorn-log-level: "info"
+dtype: "bfloat16"
+served-model-name: "mistral_small"
+tokenizer_mode: mistral
+config_format: mistral
+load_format: mistral
+tool-call-parser: mistral
+enable-auto-tool-choice: true
+tensor-parallel-size: 2
+```
+
+4. Run the script with the selected configuration file:
+```bash
+./scripts/slurm/submit_job.sh <config_file>
+```
+5. You will find the stderr and the stdout in the `slurm_out/<job_id>.[out/err]` file.
 
 If you want to run your own script create a bash script following the example in `scripts/singularity/run.sh`
