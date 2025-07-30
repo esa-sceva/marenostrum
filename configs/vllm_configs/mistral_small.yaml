@@ -11,3 +11,4 @@ load_format: mistral
 tool-call-parser: mistral
 enable-auto-tool-choice: true
 tensor-parallel-size: 2
+disable-log-requests: true

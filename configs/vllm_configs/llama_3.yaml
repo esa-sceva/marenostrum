@@ -5,3 +5,4 @@ port: 8000
 uvicorn-log-level: "info"
 dtype: "bfloat16"
 served-model-name: "llama-3-8b"
+disable-log-requests: true

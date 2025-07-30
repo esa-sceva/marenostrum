@@ -1,8 +1,8 @@
 # SLURM directives
 JOB_NAME=qa_llama70
 WORK_DIR=.
-OUT_FILE=slurm_out_prod/mpi_%j.out
-ERR_FILE=slurm_out_prod/mpi_%j.err
+OUT_FILE=slurm_out_prod/mpi_%x_%j.out
+ERR_FILE=slurm_out_prod/mpi_%x_%j.err
 NTASKS=1
 CPUS_PER_TASK=80
 TIME=24:00:00

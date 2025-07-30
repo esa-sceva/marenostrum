@@ -1,5 +1,23 @@
 # Marenostrum
 
+## Setup singularity container
+Install singularity:
+```bash
+./scripts/singularity/install_singularity.sh
+```
+
+Build the container:
+```bash
+
+singularity build --fakeroot container.sif ./scripts/definition_files/mystral_synth_gen.def
+
+```
+
+To run an interactive shell in the container, use:
+```
+singularity exec container.sif /bin/bash
+```
+
 
 ## Download huggingface assets
 Use `huggingface/download_hf_assets.py` to download huggingface assets. Follow the sample configuration provided and add the model and the dataset you want to download.

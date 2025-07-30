@@ -13,6 +13,8 @@ steps:
       document:
         text: content
 
+        document['text'] =
+
 
   - method: RandomGenerator
     description: "Generate random numbers"
