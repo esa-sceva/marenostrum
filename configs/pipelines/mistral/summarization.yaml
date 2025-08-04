@@ -1,0 +1,100 @@
+checkpoint_strategy: "steps"
+checkpoint_interval: 50
+log_level: "INFO"
+detailed_progress_info: true
+steps:
+  - method: JSONLReader
+    description: "read docs"
+    run_params:
+      show_progress: true
+    params:
+      path: "dataset/anonymized_sample_split_1.jsonl"
+    output:
+      document:
+        text: content
+
+
+  - method: RandomGenerator
+    description: "Generate random numbers"
+    run_params:
+      show_progress: true
+    params:
+      low: 3000
+      high: 8000
+    output:
+      max_chunk_size:
+        max_chunk_size: number
+    input: document
+
+
+  - method: Combine
+    description: "Combine document and chunk size"
+    input:
+      - document
+      - max_chunk_size
+    output: document_chunk_size
+
+  - method: Chunk
+    description: "chunk documents"
+    params:
+      chunker_params:
+        add_headers: True
+        merge_small_chunks: True
+      replay_fields:
+        - path
+    input: document_chunk_size
+    output: chunk
+
+
+  - method: LLM
+    description: "Generate Q&A"
+    run_params:
+      show_progress: true
+      input_batch_size: 1
+    params:
+      chosen_model_field: "chosen_model"
+      models:
+        mistral_large:
+          model: "mistral_large"
+          temperature: 0.3
+          max_tokens: 50000
+          base_url: "http://localhost:8000/v1/"
+          api_key: 'EMPTY'
+          response_model:
+            summary: str
+          template: |
+            Can you provide a comprehensive summary of the given text?
+            The summary should cover all the key points and main ideas presented in the original text, while also condensing the information into a concise and easy-to-understand format.
+            Please ensure that the summary includes relevant details and examples that support the main ideas, while avoiding any unnecessary information or repetition.
+            The length of the summary should be appropriate for the length and complexity of the original text, providing a clear and accurate overview without omitting any important information.
+    
+            Text start here:
+            {chunk}
+    input: chunk
+    output: llm_output
+
+  - method: Combine
+    description: "Combine LLM out and input"
+    input:
+      - llm_output
+      - chunk
+    output: llm_out_chunk
+
+  - method: JSONLWriter
+    description: "write output"
+    run_params:
+      show_progress: true
+    params:
+      path: "data/summarization_out.jsonl"
+    input:
+      llm_out_chunk
+
+#
+#  - method: JSONLWriter
+#    description: "write output"
+#    run_params:
+#      show_progress: true
+#    params:
+#      path: "data/summarization_chunk.jsonl"
+#    input:
+#      chunk

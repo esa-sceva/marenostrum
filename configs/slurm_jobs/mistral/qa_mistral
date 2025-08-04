@@ -1,0 +1,20 @@
+# SLURM directives
+JOB_NAME=qa_mistral_large
+WORK_DIR=.
+OUT_FILE=slurm_out_prod/qa_mistral_large/mpi_%x_%j.out
+ERR_FILE=slurm_out_prod/qa_mistral_large/mpi_%x_%j.err
+NTASKS=1
+CPUS_PER_TASK=80
+TASK_PER_NODE=1
+TIME=00:30:00
+GRES=gpu:4
+NODES=2
+
+# SLURM submission options
+ACCOUNT=ehpc190
+QOS=acc_debug
+
+# Job-specific arguments
+VLLM_CONFIG=./configs/vllm_configs/mistral_large.yaml
+PIPELINE=./configs/pipelines/mistral/qa_mistral.yaml
+OUTPUT_DIR=./out/mistral/qa_mistral

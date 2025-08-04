@@ -1,0 +1,15 @@
+# config.yaml
+
+model: /gpfs/scratch/<project_id>/myfolder/hf_cache/models/models--mistralai--Mistral-Large-Instruct-2407/snapshots/39ae65a130671df1ce97c50111dc68706ec12d6f
+port: 8000
+uvicorn-log-level: "info"
+dtype: "bfloat16"
+served-model-name: "Mistral-Large-Instruct-2407"
+tokenizer_mode: mistral
+config_format: mistral
+load_format: mistral
+tool-call-parser: mistral
+enable-auto-tool-choice: true
+tensor-parallel-size: 8
+disable-log-requests: true
+pipeline_parallel_size: 2
