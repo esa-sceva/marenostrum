@@ -19,8 +19,8 @@ steps:
     run_params:
       show_progress: true
     params:
-      low: 3000
-      high: 8000
+      low: 2000
+      high: 4000
     output:
       max_chunk_size:
         max_chunk_size: number

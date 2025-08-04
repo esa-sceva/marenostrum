@@ -69,7 +69,7 @@ echo "- Checkpoint ID: ${CHECKPOINT_ID:-none}"
 echo "- Max samples: ${MAX_SAMPLES:-∞}"
 
 
-singularity exec --nv mistral_gen.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run.sh "$VLLM_CONFIG" "$PIPELINE" "$OUTPUT_DIR" "${CHECKPOINT_ID:-}" "${MAX_SAMPLES:-}"
+singularity exec --nv mistral_gen.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run.sh $VLLM_CONFIG "$PIPELINE" "$OUTPUT_DIR" "${CHECKPOINT_ID:-}"
 EOF
 
 # Submit job

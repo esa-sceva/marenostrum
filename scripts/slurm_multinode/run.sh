@@ -4,10 +4,14 @@ PIPELINE="$1"
 OUTPUT_DIR="$2"
 CHECKPOINT_ID="$3"
 
-if [[ -z "$CONFIG_PATH" || -z "$PIPELINE" || -z "$OUTPUT_DIR" ]]; then
-    echo "Usage: ./run.sh <config_path> <pipeline> <output_dir>"
+if [[ -z "$PIPELINE" || -z "$OUTPUT_DIR" ]]; then
+    echo "Usage: ./run.sh <pipeline> <output_dir>"
     exit 1
 fi
+
+echo 'Activating virtual environment...'
+source /mistral-synth-gen/.venv/bin/activate
+
 
 
 # Check if secretsauce is installed

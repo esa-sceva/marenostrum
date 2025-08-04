@@ -13,16 +13,13 @@ steps:
       document:
         text: content
 
-        document['text'] =
-
-
   - method: RandomGenerator
     description: "Generate random numbers"
     run_params:
       show_progress: true
     params:
-      low: 5000
-      high: 10000
+      low: 2000
+      high: 4000
     output:
       max_chunk_size:
         max_chunk_size: number

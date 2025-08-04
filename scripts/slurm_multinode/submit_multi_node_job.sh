@@ -1,17 +1,5 @@
 #!/bin/bash
 
-#SBATCH --job-name=test_multi_node
-#SBATCH --nodes=2
-#SBATCH --gres=gpu:4
-#SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=80
-#SBATCH --time=02:00:00
-#SBATCH --output=ray-cluster-%j.out
-#SBATCH --error=ray-cluster-%j.err
-#SBATCH --account=ehpc190
-#SBATCH --qos=acc_ehpc
-
-
 CONFIG_FILE="$1"
 if [[ -z "$CONFIG_FILE" ]]; then
   echo "Usage: ./submit_job.sh <job_config.env>"
@@ -21,20 +9,6 @@ fi
 # Load job configuration
 source "$CONFIG_FILE"
 
-
-
-IMAGE=/apps/ACC/VLLM/EXAMPLES/SINGULARITY/IMAGES/vllm-0.8.3.sif
-MODEL_PATH="/gpfs/scratch/<project_id>/myfolder/hf_cache/models/models--mistralai--Mistral-Large-Instruct-2407/snapshots/39ae65a130671df1ce97c50111dc68706ec12d6f"
-HUGGINGFACE_HOME="/gpfs/scratch/<project_id>/myfolder/hf_cache/"
-
-
-# Check GPUs before proceeding
-if ./check_GPUs.sh; then
-    echo "GPUs are operational. Proceeding with the setup..."
-else
-    echo "GPUs are not operational. Exiting."
-    exit 1
-fi
 
 # Prompt for checkpoint if available
 CHECKPOINT_ID=""
@@ -63,14 +37,40 @@ if [[ -d "$CHECKPOINT_DIR" ]]; then
     fi
 fi
 
+mkdir -p "$(dirname "$OUT_FILE")"
+mkdir -p "$(dirname "$ERR_FILE")"
 
 
+# Create temporary SLURM script
+TMP_SLURM_SCRIPT=$(mktemp)
+echo $TMP_SLURM_SCRIPT
+
+cat <<EOF > "$TMP_SLURM_SCRIPT"
+#!/bin/bash
+#SBATCH -D $WORK_DIR
+#SBATCH --job-name=$JOB_NAME
+#SBATCH --nodes=$NODES
+#SBATCH --gres=gpu:4
+#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=80
+#SBATCH --time=$TIME
+#SBATCH --output=$OUT_FILE
+#SBATCH --error=$ERR_FILE
+#SBATCH --account=$ACCOUNT
+#SBATCH --qos=$QOS
 # Load modules
 module load singularity
+# Check GPUs before proceeding
+if $CHECK_GPU; then
+    echo "GPUs are operational. Proceeding with the setup..."
+else
+    echo "GPUs are not operational. Exiting."
+    exit 1
+fi
 
 
 # Export variables
-export SRUN_CPUS_PER_TASK=${SLURM_CPUS_PER_TASK}
+export SRUN_CPUS_PER_TASK=\${SLURM_CPUS_PER_TASK}
 
 # NCCL variables
 export NCCL_NET=IB
@@ -86,43 +86,46 @@ export RAY_USAGE_STATS_ENABLED=1
 
 
 # Get current hostnames and Head Node
-nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
-nodes_array=($nodes)
-head_node=${nodes_array[0]}
-head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address)
+nodes=\$(scontrol show hostnames "\$SLURM_JOB_NODELIST")
+nodes_array=(\$nodes)
+head_node=\${nodes_array[0]}
+head_node_ip=\$(srun --nodes=1 --ntasks=1 -w "\$head_node" hostname --ip-address)
 
 # Head the head_node_ip and port
 port=6379
-ip_head=$head_node_ip:$port
+ip_head=\$head_node_ip:\$port
 export ip_head
 
 
 # Start the Head Node, wait until all ray cluster is initialized.
-echo "Starting HEAD at $head_node"
-export VLLM_HOST_IP=$head_node_ip
-srun -n 1 --nodes=1 --gres=gpu:4 -c 80 --cpu-bind=none  -w "$head_node" --export=ALL,VLLM_HOST_IP=$head_node_ip bash run_cluster.sh $IMAGE $head_node_ip --head $HUGGINGFACE_HOME &
+echo "Starting HEAD at \$head_node"
+export VLLM_HOST_IP=\$head_node_ip
+srun -n 1 --nodes=1 --gres=gpu:4 -c 80 --cpu-bind=none  -w "\$head_node" --export=ALL,VLLM_HOST_IP=\$head_node_ip bash $RUN_CLUSTER $IMAGE \$head_node_ip --head $HUGGINGFACE_HOME &
 sleep 30
 
 
 # Start Ray cluster on worker nodes
-worker_num=$((SLURM_NNODES - 1))
+worker_num=\$((SLURM_NNODES - 1))
 for ((i = 1; i <= worker_num; i++)); do
-    node_i=${nodes_array[$i]}
-    echo "Starting WORKER $i at $node_i"
-    local_node_ip=$(srun -n 1 -N 1 -c 1 -w "$node_i" hostname --ip-address)
-    export VLLM_HOST_IP=$local_node_ip
-    ip_local=$local_node_ip:$port
-    srun -n 1 --nodes=1 --gres=gpu:4 -c 80 --cpu-bind=none -w "$node_i" --export=ALL,VLLM_HOST_IP=$local_node_ip bash run_cluster.sh $IMAGE $head_node_ip --worker $HUGGINGFACE_HOME &
+    node_i=\${nodes_array[\$i]}
+    echo "Starting WORKER \$i at \$node_i"
+    local_node_ip=\$(srun -n 1 -N 1 -c 1 -w "\$node_i" hostname --ip-address)
+    export VLLM_HOST_IP=\$local_node_ip
+    ip_local=\$local_node_ip:\$port
+    srun -n 1 --nodes=1 --gres=gpu:4 -c 80 --cpu-bind=none -w "\$node_i" --export=ALL,VLLM_HOST_IP=\$local_node_ip bash $RUN_CLUSTER $IMAGE \$head_node_ip --worker $HUGGINGFACE_HOME &
     sleep 3
 done
 
 sleep 120
-echo "Starting RUN at $head_node"
-export VLLM_HOST_IP=$head_node_ip
+echo "Starting RUN at \$head_node"
+export VLLM_HOST_IP=\$head_node_ip
 
 
 # Once the ray cluster is initialized, Serve vLLM Model using singularity image.
-singularity run --nv $IMAGE --model $MODEL_PATH ls--tokenizer_mode mistral --config_format mistral --load_format mistral --tensor_parallel_size 8 --served_model_name mistral_large  --swap-space 2 --cpu-offload-gb 0.5 --enable-chunked-prefill --enforce-eager --distributed-executor-backend=ray &
+singularity exec --nv $IMAGE vllm serve --config $VLLM_CONFIG  &
 
 
 singularity exec mistral_gen.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm_multinode/run.sh "$PIPELINE" "$OUTPUT_DIR" "${CHECKPOINT_ID:-}"
+EOF
+
+sbatch -A "$ACCOUNT" -q "$QOS" "$TMP_SLURM_SCRIPT"
