@@ -2,3 +2,7 @@ libraries/
 project/
 .idea/
 .env
+slurm_tmp/
+pipelines_tmp/
+generated_data/
+dataset/

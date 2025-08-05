@@ -1,0 +1,23 @@
+# SLURM directives
+JOB_NAME=qa_mistral_large
+WORK_DIR=.
+OUT_FILE=
+ERR_FILE=
+TIME=72:00:00
+NODES=2
+
+# SLURM submission options
+ACCOUNT=ehpc190
+QOS=acc_ehpc
+
+# Job-specific arguments
+VLLM_CONFIG=
+PIPELINE=
+OUTPUT_DIR=
+
+
+# Multi node settings
+HUGGINGFACE_HOME="/gpfs/scratch/<project_id>/myfolder/hf_cache/"
+IMAGE=/gpfs/projects/<project_id>/myfolder/vllm.sif
+RUN_CLUSTER=/gpfs/projects/<project_id>/myfolder/scripts/slurm_multinode/run_cluster.sh
+CHECK_GPU=/gpfs/projects/<project_id>/myfolder/scripts/slurm_multinode/check_GPUs.sh
