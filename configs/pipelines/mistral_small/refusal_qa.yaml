@@ -41,8 +41,8 @@ steps:
     params:
       chosen_model_field: "chosen_model"
       models:
-        Mistral-Large-Instruct-2411:
-          model: "Mistral-Large-Instruct-2411"
+        Mistral-Small-3.2-24B-Instruct-2506:
+          model: "Mistral-Small-3.2-24B-Instruct-2506"
           temperature: 0.3
           max_tokens: 30000
           base_url: "http://localhost:8000/v1/"

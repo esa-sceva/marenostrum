@@ -10,7 +10,7 @@ GRES=gpu:4
 
 # SLURM submission options
 ACCOUNT=ehpc190
-QOS=acc_ehpc
+QOS=acc_debug
 
 # Job-specific arguments
 VLLM_CONFIG=./configs/vllm_configs/qwen72B.yaml

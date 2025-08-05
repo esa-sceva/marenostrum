@@ -1,0 +1,18 @@
+# SLURM directives
+JOB_NAME=
+WORK_DIR=.
+OUT_FILE=
+ERR_FILE=
+NTASKS=1
+CPUS_PER_TASK=80
+TIME=72:00:00
+GRES=gpu:4
+
+# SLURM submission options
+ACCOUNT=ehpc190
+QOS=acc_ehpc
+
+# Job-specific arguments
+VLLM_CONFIG=
+PIPELINE=
+OUTPUT_DIR=

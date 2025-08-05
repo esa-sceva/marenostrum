@@ -1,0 +1,9 @@
+# config.yaml
+
+model: /gpfs/scratch/<project_id>/myfolder/hf_cache/models/models--Qwen--Qwen2.5-72B-Instruct/snapshots/495f39366efef23836d0cfae4fbe635880d2be31
+port: 8000
+uvicorn-log-level: "info"
+dtype: "bfloat16"
+served-model-name: "Qwen3-235B-A22B-Instruct-2507"
+tensor-parallel-size: 8
+max-model-len: 262144
