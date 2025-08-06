@@ -13,16 +13,27 @@ models = [
         'pipeline_template': './configs/pipelines/template/qa.yaml',
         'vllm_config': './configs/vllm_configs/mistral_large.yaml'
 
-    }
-    # {
-    #     'model_name': 'mistral_small',
-    #     'shards': [i for i in range(5, 10)], # Data shards you want to process
-    #     'served_model': 'Mistral-Small-Instruct-2411', # Must match the model name in the vllm config
-    #     'task': 'qa',
-    #     'slurm_template': './configs/slurm_jobs/template/single_node',
-    #     'pipeline_template': './configs/pipelines/template/qa.yaml',
-    #     'vllm_config': './configs/vllm_configs/mistral_small.yaml'
-    # }
+    },
+    {
+        'model_name': 'mistral_large',
+        'shards': [i for i in range(1, 3)],
+        'task': 'refusal_qa',
+        'served_model': 'Mistral-Large-Instruct-2411',
+        'slurm_template': './configs/slurm_jobs/template/multi_node',
+        'pipeline_template': './configs/pipelines/template/refusal_qa.yaml',
+        'vllm_config': './configs/vllm_configs/mistral_large.yaml'
+
+    },
+    {
+        'model_name': 'mistral_large',
+        'shards': [i for i in range(1, 3)],
+        'task': 'summarization',
+        'served_model': 'Mistral-Large-Instruct-2411',
+        'slurm_template': './configs/slurm_jobs/template/multi_node',
+        'pipeline_template': './configs/pipelines/template/summarization.yaml',
+        'vllm_config': './configs/vllm_configs/mistral_large.yaml'
+
+    },
 ]
 
 def format_pipeline(pipeline_template, served_model, data_path):
@@ -70,6 +81,8 @@ def format_slurm(slurm_template, vllm_config, pipeline_path, run_name, model_nam
     # Replace log dir
     log_dir = './slurm_out_prod/' + f'{model_name}/{task}'
     os.makedirs(log_dir, exist_ok=True)
+
+    print(log_dir)
 
     slurm = slurm.replace('OUT_FILE=', f"OUT_FILE={log_dir}/mpi_%x_%j.out")
     slurm = slurm.replace('ERR_FILE=', f"ERR_FILE={log_dir}/mpi_%x_%j.err")
