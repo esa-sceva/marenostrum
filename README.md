@@ -85,3 +85,12 @@ tensor-parallel-size: 2
 5. You will find the stderr and the stdout in the `slurm_out/<job_id>.[out/err]` file.
 
 If you want to run your own script create a bash script following the example in `scripts/singularity/run.sh`
+
+## Run several jobs
+In marenostrum load the python module:
+```bash
+module load python
+```
+If some modules are not loaded, you can load them with the same command.
+
+Use the `scripts/run_jobs.py` to run several jobs as defined in the script.

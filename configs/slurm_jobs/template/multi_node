@@ -1,9 +1,9 @@
 # SLURM directives
-JOB_NAME=qa_mistral_large
+JOB_NAME=
 WORK_DIR=.
 OUT_FILE=
 ERR_FILE=
-TIME=72:00:00
+TIME=7:00:00
 NODES=2
 
 # SLURM submission options

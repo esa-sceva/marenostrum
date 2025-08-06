@@ -1,25 +1,28 @@
+
+
 import os
+import subprocess
 
 models = [
     {
         'model_name': 'mistral_large',
-        'shards': [i for i in range(1, 5)],
+        'shards': [i for i in range(1, 3)],
         'task': 'qa',
         'served_model': 'Mistral-Large-Instruct-2411',
         'slurm_template': './configs/slurm_jobs/template/multi_node',
         'pipeline_template': './configs/pipelines/template/qa.yaml',
         'vllm_config': './configs/vllm_configs/mistral_large.yaml'
 
-    },
-    {
-        'model_name': 'mistral_small',
-        'shards': [i for i in range(5, 10)],
-        'served_model': 'Mistral-Small-Instruct-2411',
-        'task': 'qa',
-        'slurm_template': './configs/slurm_jobs/template/single_node',
-        'pipeline_template': './configs/pipelines/template/qa.yaml',
-        'vllm_config': './configs/vllm_configs/mistral_small.yaml'
     }
+    # {
+    #     'model_name': 'mistral_small',
+    #     'shards': [i for i in range(5, 10)], # Data shards you want to process
+    #     'served_model': 'Mistral-Small-Instruct-2411', # Must match the model name in the vllm config
+    #     'task': 'qa',
+    #     'slurm_template': './configs/slurm_jobs/template/single_node',
+    #     'pipeline_template': './configs/pipelines/template/qa.yaml',
+    #     'vllm_config': './configs/vllm_configs/mistral_small.yaml'
+    # }
 ]
 
 def format_pipeline(pipeline_template, served_model, data_path):
@@ -30,6 +33,24 @@ def format_pipeline(pipeline_template, served_model, data_path):
     pipeline = pipeline.replace('$MODEL', served_model)
     pipeline = pipeline.replace('$DATA_PATH', data_path)
     return pipeline
+
+import subprocess
+import getpass
+
+def job_is_running(job_name):
+    try:
+        user = getpass.getuser()
+        result = subprocess.run(
+            ["squeue", "--name", job_name, "-u", user],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return len(result.stdout.strip().splitlines()) > 1  # Header + at least one job
+    except subprocess.CalledProcessError as e:
+        print(f"Error checking squeue: {e}")
+        return False
+
 
 def format_slurm(slurm_template, vllm_config, pipeline_path, run_name, model_name, task):
     # Load the SLURM template
@@ -44,7 +65,7 @@ def format_slurm(slurm_template, vllm_config, pipeline_path, run_name, model_nam
     slurm = slurm.replace('VLLM_CONFIG=', f'VLLM_CONFIG={vllm_config}')
     slurm = slurm.replace('PIPELINE=', f'PIPELINE={pipeline_path}')
     slurm = slurm.replace('OUTPUT_DIR=', f'OUTPUT_DIR={output_dir}')
-    slurm = slurm.replace('RUN_NAME=', f"JOB_NAME={output_dir}")
+    slurm = slurm.replace('JOB_NAME=', f"JOB_NAME={run_name}")
 
     # Replace log dir
     log_dir = './slurm_out_prod/' + f'{model_name}/{task}'
@@ -56,20 +77,22 @@ def format_slurm(slurm_template, vllm_config, pipeline_path, run_name, model_nam
 
 def run_slurm_job(job_name, slurm_path, is_multinode:bool):
     # Check if the JOB_NAME is already running
-    is_running = os.system(f'squeue -u $USER | grep {job_name}') == 0
-    if is_running:
+    if job_is_running(job_name):
         print(f"Job {job_name} is already running.")
         return
     # Submit the SLURM job
     if is_multinode:
+        print('Submitting multi-node job...')
         os.system(f'./scripts/slurm_multinode/submit_multi_node_job.sh {slurm_path}')
     else:
+        print('Submitting single node job...')
         os.system(f'./scripts/slurm/submit_job.sh {slurm_path}')
 
 
 def run_jobs():
     for model in models:
         for shard in model['shards']:
+            print(f"Running job for model {model['model_name']} on shard {shard}...")
             task = model['task']
             model_name = model['model_name']
             run_name = f"{model_name}_{task}_{shard}"
@@ -93,10 +116,8 @@ def run_jobs():
             slurm_script_tmp_file = f"{slurm_tmp_path}/{run_name}"
             with open(slurm_script_tmp_file, 'w') as file:
                 file.write(slurm_script)
-
-
-            # Submit the SLURM job (uncomment the next line to actually submit)
-            # os.system(f'sbatch {slurm_script_path}')
+            # Submit the SLURM job
+            run_slurm_job(run_name, slurm_script_tmp_file, is_multinode=model['slurm_template'].endswith('multi_node'))
 
 
 def main():
