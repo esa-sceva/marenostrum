@@ -9,10 +9,8 @@ TIME=00:50:00
 GRES=gpu:2
 
 # SLURM submission options
-ACCOUNT=ehpc190
+ACCOUNT=<project_id>
 QOS=acc_debug
 
 # Job-specific arguments
 VLLM_CONFIG=./configs/vllm_configs/mistral_small.yaml
-PIPELINE=./configs/pipelines/single_hop_qa_w_bonus.yaml
-OUTPUT_DIR=./out/single_hop_qa_w_bonus

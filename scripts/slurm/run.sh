@@ -46,13 +46,6 @@ MONITOR_PID=$!
 
 
 
-# Check if secretsauce is installed
-if ! command -v secretsauce &> /dev/null; then
-    echo "secretsauce command not found. Please install it first."
-    exit 1
-fi
-
-
 # Start the vLLM server with the provided config
 vllm serve --config "$CONFIG_PATH" &
 SERVER_PID=$!
