@@ -9,7 +9,7 @@ Install singularity:
 Build the container:
 ```bash
 
-singularity build --fakeroot container.sif ./scripts/definition_files/mystral_synth_gen.def
+singularity build --fakeroot container.sif ./scripts/singularity/definition_files/satcom_synth_data_gen.def
 
 ```
 
@@ -34,6 +34,8 @@ After the download use the `scripts/huggingface/deploy.sh` to deploy the models 
 ./scripts/huggingface/deploy.sh <local_path> <marenostrum user> [remote_path]
 ```
 
+
+
 ## Run a job 
 To make a run follow the following steps:
 1.  Cd in the project root directory 
@@ -53,7 +55,7 @@ TIME=00:50:00
 GRES=gpu:2       # Number of GPUs to use
 
 # SLURM submission options
-ACCOUNT=ehpc190
+ACCOUNT=<project_id>
 QOS=acc_debug
 
 # Job-specific arguments
@@ -65,7 +67,7 @@ OUTPUT_DIR=./out/single_hop_qa_w_bonus
 ```yaml
 # config.yaml
 
-model: /gpfs/projects/<project_id>/myfolder/hf_cache/models/models--mistralai--Mistral-Small-3.2-24B-Instruct-2506/snapshots/46a27874d7f7a7b38344124d32a7a3c4589d3b53
+model: /gpfs/projects/<project_id>/eve/hf_cache/models/models--mistralai--Mistral-Small-3.2-24B-Instruct-2506/snapshots/46a27874d7f7a7b38344124d32a7a3c4589d3b53
 port: 8000
 uvicorn-log-level: "info"
 dtype: "bfloat16"
