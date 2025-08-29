@@ -9,7 +9,7 @@ Install singularity:
 Build the container:
 ```bash
 
-singularity build --fakeroot new_container.sif ./scripts/singularity/definition_files/satcom_synth_data_gen.def
+singularity build --fakeroot container.sif ./scripts/singularity/definition_files/satcom_synth_data_gen.def
 
 ```
 

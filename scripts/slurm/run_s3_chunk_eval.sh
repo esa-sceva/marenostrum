@@ -24,7 +24,7 @@ echo "PyTorch check: $(python -c 'import torch; print("PyTorch version:", torch.
 # Fixed parameters from config
 INPUT_SOURCE="/gpfs/projects/<project_id>/myfolder/data_extracted"
 INPUT_TYPE="local"
-PROMPT_TEMPLATE="./evaluators/prompts/ultraRM_prompt.yaml"
+PROMPT_TEMPLATE="/satcom-synthetic-data-gen/synthetic_gen/evaluators/prompts/ultraRM_prompt.yaml"
 OUTPUT_DESTINATION="output"
 OUTPUT_TYPE="local"
 SCORE_THRESHOLD="-12"
@@ -82,10 +82,12 @@ if [ ! -d "$NLTK_DATA" ]; then
     echo "Using fallback NLTK_DATA: $NLTK_DATA"
 fi
 
-# Set Hugging Face cache and offline mode configuration
-export HF_HOME="/workspace/hf_cache"
-export TRANSFORMERS_CACHE="/workspace/hf_cache/models"
-export HF_DATASETS_CACHE="/workspace/hf_cache/datasets"
+# Set Hugging Face cache to the actual location where the model exists
+export HF_HOME="/gpfs/projects/<project_id>/myfolder/hf_cache"
+# Remove deprecated TRANSFORMERS_CACHE to avoid conflicts
+unset TRANSFORMERS_CACHE
+export HF_DATASETS_CACHE="/gpfs/projects/<project_id>/myfolder/hf_cache"
+export HUGGINGFACE_HUB_CACHE="/gpfs/projects/<project_id>/myfolder/hf_cache"
 
 # Control offline mode (set to 0 for online mode, 1 for offline mode)
 OFFLINE_MODE=${OFFLINE_MODE:-1}  # Default to offline mode for safety
@@ -101,12 +103,24 @@ else
 fi
 
 # Check if UltraRM model cache exists
+echo "=== HF CACHE DEBUG ==="
+echo "HF_HOME: $HF_HOME"
+echo "TRANSFORMERS_CACHE: $TRANSFORMERS_CACHE"
+echo "Checking direct GPFS access:"
+
 if [ -d "$HF_HOME" ]; then
-    echo "Checking cached models in $HF_HOME:"
-    find "$HF_HOME" -name "*UltraRM*" -o -name "*openbmb*" 2>/dev/null | head -5 || echo "No UltraRM model found in cache"
+    echo "HF_HOME directory exists, checking contents:"
+    ls -la "$HF_HOME" | head -10
+    echo "Looking for UltraRM model files:"
+    find "$HF_HOME" -name "*UltraRM*" -o -name "*openbmb*" 2>/dev/null | head -10 || echo "No UltraRM model found in cache"
+    
+    echo "Checking for model files structure:"
+    find "$HF_HOME" -name "config.json" 2>/dev/null | head -5 || echo "No config.json files found"
+    find "$HF_HOME" -name "tokenizer.json" 2>/dev/null | head -5 || echo "No tokenizer.json files found"
 else
     echo "WARNING: HF_HOME directory not found: $HF_HOME"
 fi
+echo "======================="
 
 # Start GPU monitoring in the background
 GPU_LOG_DIR="gpu_logs"

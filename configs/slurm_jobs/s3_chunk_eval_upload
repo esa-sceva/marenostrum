@@ -5,8 +5,8 @@ OUT_FILE=slurm_out/mpi_%j.out
 ERR_FILE=slurm_out/mpi_%j.err
 NTASKS=1
 CPUS_PER_TASK=40
-TIME=00:50:00
-GRES=gpu:2
+TIME=04:00:00
+GRES=gpu:4
 
 # SLURM submission options
 ACCOUNT=<project_id>
