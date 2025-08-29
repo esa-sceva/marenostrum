@@ -19,9 +19,16 @@ From: python:3.12
     cd satcom-synthetic-data-gen
     cd synthetic_gen
     uv venv --python 3.12
+    . .venv/bin/activate
+    
+    # Try latest CUDA versions for PyTorch 2.6+
+    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 || \
+    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu123 || \
+    uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+    
     uv pip install -r requirements.txt
-    uv pip install vllm --torch-backend=auto
     uv pip install pyarrow
+    uv pip install bitsandbytes
 
     # Download NLTK data
     . .venv/bin/activate
@@ -39,6 +46,16 @@ else:
 nltk.download('punkt')
 nltk.download('punkt_tab')
 print('NLTK data downloaded successfully')
+
+# Quick GPU PyTorch verification
+print('Verifying GPU PyTorch installation...')
+import torch
+print(f'PyTorch version: {torch.__version__}')
+print(f'CUDA compiled: {torch.version.cuda}')
+if torch.version.cuda:
+    print('SUCCESS: GPU PyTorch installed correctly!')
+else:
+    print('ERROR: CPU-only PyTorch detected!')
 "
 
     # Create workdir
