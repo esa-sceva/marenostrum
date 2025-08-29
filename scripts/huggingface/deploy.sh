@@ -9,8 +9,7 @@
 LOCAL_PATH="$1"
 USERNAME="$2"
 REMOTE_PATH="${3:-}"  # optional
-
-GROUP=ehpc190
+GROUP=<project_id>
 
 # === CHECKS ===
 if [ -z "$LOCAL_PATH" ] || [ -z "$USERNAME" ] || [ -z "$USER" ]; then

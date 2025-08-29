@@ -1,5 +1,5 @@
 hf_cache_dir: "project/hf_cache"
 models:
-  - "Qwen/Qwen2.5-72B"
+  - "openbmb/UltraRM-13b"
 datasets:
   - name: squad       # no config/subset

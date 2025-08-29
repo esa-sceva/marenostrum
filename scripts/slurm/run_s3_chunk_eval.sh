@@ -70,9 +70,43 @@ mkdir -p "$(dirname "$OUTPUT_DESTINATION")"
 mkdir -p "$(dirname "$LOCAL_JSON_PATH")"
 mkdir -p "$LOGS_FOLDER"
 
-# Set environment variables for NLTK data
-export NLTK_DATA="/gpfs/projects/<project_id>/myfolder/nltk_data"
+# Set environment variables for NLTK data (use container's internal NLTK data)
+export NLTK_DATA="/root/nltk_data"
 echo "NLTK_DATA set to: $NLTK_DATA"
+echo "Checking NLTK data availability:"
+ls -la "$NLTK_DATA/" 2>/dev/null || echo "NLTK data directory not found, trying alternative..."
+
+# Fallback to user nltk_data if root doesn't work
+if [ ! -d "$NLTK_DATA" ]; then
+    export NLTK_DATA="$HOME/nltk_data"
+    echo "Using fallback NLTK_DATA: $NLTK_DATA"
+fi
+
+# Set Hugging Face cache and offline mode configuration
+export HF_HOME="/workspace/hf_cache"
+export TRANSFORMERS_CACHE="/workspace/hf_cache/models"
+export HF_DATASETS_CACHE="/workspace/hf_cache/datasets"
+
+# Control offline mode (set to 0 for online mode, 1 for offline mode)
+OFFLINE_MODE=${OFFLINE_MODE:-1}  # Default to offline mode for safety
+export TRANSFORMERS_OFFLINE=$OFFLINE_MODE
+export HF_HUB_OFFLINE=$OFFLINE_MODE
+
+echo "HF_HOME set to: $HF_HOME"
+echo "TRANSFORMERS_CACHE set to: $TRANSFORMERS_CACHE"
+if [ "$OFFLINE_MODE" = "1" ]; then
+    echo "OFFLINE MODE ENABLED - Using cached models only"
+else
+    echo "ONLINE MODE ENABLED - Can download models from internet"
+fi
+
+# Check if UltraRM model cache exists
+if [ -d "$HF_HOME" ]; then
+    echo "Checking cached models in $HF_HOME:"
+    find "$HF_HOME" -name "*UltraRM*" -o -name "*openbmb*" 2>/dev/null | head -5 || echo "No UltraRM model found in cache"
+else
+    echo "WARNING: HF_HOME directory not found: $HF_HOME"
+fi
 
 # Start GPU monitoring in the background
 GPU_LOG_DIR="gpu_logs"
