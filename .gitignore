@@ -8,3 +8,10 @@ generated_data/
 dataset/
 go1.13.15.linux-amd64.tar.gz
 container.sif
+UltraRMEvaluator.py
+start_vllm.sh
+s3_chunk_eval_upload.py
+ModelBase.py
+llm_api.py
+LLMGenerator.py
+container_old.sif

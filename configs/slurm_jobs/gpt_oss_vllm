@@ -1,0 +1,33 @@
+# SLURM directives for GPT-OSS with vLLM
+JOB_NAME=gpt_oss_vllm_qa
+WORK_DIR=.
+OUT_FILE=slurm_out/gpt_oss_vllm_%j.out
+ERR_FILE=slurm_out/gpt_oss_vllm_%j.err
+NTASKS=1
+CPUS_PER_TASK=20
+TIME=02:00:00
+GRES=gpu:1
+
+# SLURM submission options
+ACCOUNT=<project_id>
+QOS=acc_debug
+
+# Job-specific arguments for GPT-OSS vLLM
+INPUT_SOURCE="/gpfs/projects/<project_id>/myfolder/data_extracted_cleaned"
+INPUT_TYPE="local"
+OUTPUT_DESTINATION="/gpfs/projects/<project_id>/myfolder/results"
+OUTPUT_TYPE="local"
+MODEL_NAME="openai/gpt-oss-20b"
+TEMPERATURE="0.1"
+MAX_RETRIES="3"
+PROMPT_PATH="/satcom-synthetic-data-gen/synthetic_gen/prompts/qa_cosmosage_context.yaml"
+RESULTS_FILE=""
+N_DOCS="20"
+N_SHOTS="2"
+BACKEND="vllm"
+NUM_WORKERS="2"
+VLLM_URL="http://localhost:8000/v1"
+S3_BUCKET=""
+
+# Model loading mode (1 = offline, 0 = online)
+OFFLINE_MODE=1

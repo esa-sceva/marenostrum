@@ -1,5 +1,6 @@
 hf_cache_dir: "project/hf_cache"
 models:
   - "openbmb/UltraRM-13b"
+  - "openai/gpt-oss-20b"
 datasets:
   - name: squad       # no config/subset

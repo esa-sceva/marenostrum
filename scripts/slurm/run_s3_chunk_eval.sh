@@ -19,18 +19,21 @@ fi
 
 echo "Python version: $(python --version 2>&1)"
 echo "Python path: $(which python 2>&1)"
-echo "PyTorch check: $(python -c 'import torch; print("PyTorch version:", torch.__version__)' 2>&1 || echo 'PyTorch not found')"
+echo "PyTorch check: $(python -c 'import torch; print(\"PyTorch version:\", torch.__version__)' 2>&1 || echo 'PyTorch not found')"
 
-# Fixed parameters from config
-INPUT_SOURCE="/gpfs/projects/<project_id>/myfolder/data_extracted"
-INPUT_TYPE="local"
-PROMPT_TEMPLATE="/satcom-synthetic-data-gen/synthetic_gen/evaluators/prompts/ultraRM_prompt.yaml"
-OUTPUT_DESTINATION="output"
-OUTPUT_TYPE="local"
-SCORE_THRESHOLD="-12"
-MAX_CHUNK_SIZE="4096"
-LOCAL_JSON_PATH="./selected_chunks_scores.json"
-LOGS_FOLDER="logs"
+# Use environment variables from config (no fallbacks)
+# These should be set by the submit script from the config file
+echo "Using environment variables from config:"
+echo "INPUT_SOURCE: $INPUT_SOURCE"
+echo "INPUT_TYPE: $INPUT_TYPE" 
+echo "PROMPT_TEMPLATE: $PROMPT_TEMPLATE"
+echo "OUTPUT_DESTINATION: $OUTPUT_DESTINATION"
+echo "OUTPUT_TYPE: $OUTPUT_TYPE"
+echo "SCORE_THRESHOLD: $SCORE_THRESHOLD"
+echo "MAX_CHUNK_SIZE: $MAX_CHUNK_SIZE"
+echo "LOCAL_JSON_PATH: $LOCAL_JSON_PATH"
+echo "LOGS_FOLDER: $LOGS_FOLDER"
+
 
 # Add the synthetic data gen repo to Python path (we know it's at /satcom-synthetic-data-gen)
 echo "Setting up Python path for satcom-synthetic-data-gen..."
@@ -160,15 +163,15 @@ echo "- Logs folder: $LOGS_FOLDER"
 
 # Run the s3_chunk_eval_upload module
 python -m s3_chunk_eval_upload \
-  --input_source "$INPUT_SOURCE" \
-  --input_type "$INPUT_TYPE" \
-  --prompt_template "$PROMPT_TEMPLATE" \
-  --output_destination "$OUTPUT_DESTINATION" \
-  --output_type "$OUTPUT_TYPE" \
-  --score_threshold "$SCORE_THRESHOLD" \
-  --max_chunk_size "$MAX_CHUNK_SIZE" \
-  --local_json_path "$LOCAL_JSON_PATH" \
-  --logs_folder "$LOGS_FOLDER"
+    --input_source "$INPUT_SOURCE" \
+    --input_type "$INPUT_TYPE" \
+    --prompt_template "$PROMPT_TEMPLATE" \
+    --output_destination "$OUTPUT_DESTINATION" \
+    --output_type "$OUTPUT_TYPE" \
+    --score_threshold "$SCORE_THRESHOLD" \
+    --max_chunk_size "$MAX_CHUNK_SIZE" \
+    --local_json_path "$LOCAL_JSON_PATH" \
+    --logs_folder "$LOGS_FOLDER"
 
 EXIT_CODE=$?
 

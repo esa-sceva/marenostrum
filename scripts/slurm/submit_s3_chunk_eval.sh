@@ -46,8 +46,19 @@ echo "- Max chunk size: $MAX_CHUNK_SIZE"
 echo "- Local JSON path: $LOCAL_JSON_PATH"
 echo "- Logs folder: $LOGS_FOLDER"
 
-# Run the s3_chunk_eval module using singularity
-singularity exec --nv container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_s3_chunk_eval.sh
+# Run the s3_chunk_eval module using singularity with config variables
+singularity exec --nv \
+    --env INPUT_SOURCE="$INPUT_SOURCE" \
+    --env INPUT_TYPE="$INPUT_TYPE" \
+    --env PROMPT_TEMPLATE="$PROMPT_TEMPLATE" \
+    --env OUTPUT_DESTINATION="$OUTPUT_DESTINATION" \
+    --env OUTPUT_TYPE="$OUTPUT_TYPE" \
+    --env SCORE_THRESHOLD="$SCORE_THRESHOLD" \
+    --env MAX_CHUNK_SIZE="$MAX_CHUNK_SIZE" \
+    --env LOCAL_JSON_PATH="$LOCAL_JSON_PATH" \
+    --env LOGS_FOLDER="$LOGS_FOLDER" \
+    --env OFFLINE_MODE="$OFFLINE_MODE" \
+    container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_s3_chunk_eval.sh
 EOF
 
 echo "Submitting s3_chunk_eval_upload job..."

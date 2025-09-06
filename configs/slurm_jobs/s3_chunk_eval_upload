@@ -1,26 +1,26 @@
 # SLURM directives
-JOB_NAME=s3_chunk_eval_upload
+JOB_NAME=mdpi_19
 WORK_DIR=.
 OUT_FILE=slurm_out/mpi_%j.out
 ERR_FILE=slurm_out/mpi_%j.err
 NTASKS=1
 CPUS_PER_TASK=20
-TIME=01:00:00
+TIME=10:00:00
 GRES=gpu:1
 
 # SLURM submission options
 ACCOUNT=<project_id>
-QOS=acc_debug
+QOS=acc_ehpc
 
 # Job-specific arguments
-INPUT_SOURCE="/workspace/satcom-synthetic-data-gen/data"
+INPUT_SOURCE="/gpfs/projects/<project_id>/myfolder/data/mdpi_19/"
 INPUT_TYPE="local"
-PROMPT_TEMPLATE="./evaluators/prompts/ultraRM_prompt.yaml"
-OUTPUT_DESTINATION="output"
+PROMPT_TEMPLATE="/satcom-synthetic-data-gen/synthetic_gen/prompts/ultraRM_prompt.yaml"
+OUTPUT_DESTINATION="chunks/mdpi_19"
 OUTPUT_TYPE="local"
-SCORE_THRESHOLD="-12"
+SCORE_THRESHOLD="-1000"
 MAX_CHUNK_SIZE="4096"
-LOCAL_JSON_PATH="./selected_chunks_scores.json"
+LOCAL_JSON_PATH="./_analytics_/mdpi_19.json"
 LOGS_FOLDER="logs"
 
 # Model loading mode (1 = offline, 0 = online)
