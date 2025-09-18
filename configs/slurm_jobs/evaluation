@@ -1,0 +1,31 @@
+# SLURM directives for Llama 3.3 70B Evaluation with vLLM
+JOB_NAME=qwen2.5_72b_eval
+WORK_DIR=.
+OUT_FILE=slurm_out_evaluation/qwen2.5_72b_eval_%j.out
+ERR_FILE=slurm_out_evaluation/qwen2.5_72b_eval_%j.err
+VLLM_LOG_FILE=slurm_out_evaluation/qwen2.5_72b_eval_%j_vllm_server.log
+NTASKS=1
+CPUS_PER_TASK=80
+TIME=12:00:00
+GRES=gpu:4
+
+# SLURM submission options
+ACCOUNT=<project_id>
+QOS=acc_ehpc
+
+# Job-specific arguments for Qwen2.5 72B Evaluation vLLM
+MODEL_NAME="qwen2.5-72b"
+DATASET_PATH="/gpfs/projects/<project_id>/myfolder/results/qa_arxiv_1.jsonl"
+RESULTS_PATH="/gpfs/projects/<project_id>/myfolder/grades/qa_grades_arxiv_1.jsonl"
+OUTPUT_PATH="/gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_arxiv_1.jsonl"
+PROMPT_PATH=""
+THRESHOLD="3"
+PERTINENCE_THRESHOLD="4"
+CONTEXTUAL_RELEVANCE_THRESHOLD="4"
+CORRECTNESS_THRESHOLD="4"
+FILTER_LOGIC="AND"
+N_DOCS="-1"
+N_SHOTS="3"
+TEMPERATURE="0.2"
+BACKEND="vllm"
+NUM_WORKERS="10"

@@ -1,33 +1,29 @@
-# SLURM directives for GPT-OSS with vLLM
-JOB_NAME=gpt_oss_vllm_qa
+# SLURM directives for Llama 3.3 70B with vLLM
+JOB_NAME=radioeng_cz
 WORK_DIR=.
-OUT_FILE=slurm_out/gpt_oss_vllm_%j.out
-ERR_FILE=slurm_out/gpt_oss_vllm_%j.err
+OUT_FILE=slurm_out_generation/llama33_70b_vllm_%j.out
+ERR_FILE=slurm_out_generation/llama33_70b_vllm_%j.err
+VLLM_LOG_FILE=slurm_out_generation/llama33_70b_vllm_%j_vllm_server.log
 NTASKS=1
-CPUS_PER_TASK=20
-TIME=02:00:00
-GRES=gpu:1
+CPUS_PER_TASK=80
+TIME=12:00:00
+GRES=gpu:4
 
 # SLURM submission options
 ACCOUNT=<project_id>
-QOS=acc_debug
+QOS=acc_ehpc
 
-# Job-specific arguments for GPT-OSS vLLM
-INPUT_SOURCE="/gpfs/projects/<project_id>/myfolder/data_extracted_cleaned"
+# Job-specific arguments for Llama 3.3 70B vLLM
+INPUT_SOURCE="/gpfs/projects/<project_id>/myfolder/data/radioeng_cz/"
 INPUT_TYPE="local"
 OUTPUT_DESTINATION="/gpfs/projects/<project_id>/myfolder/results"
 OUTPUT_TYPE="local"
-MODEL_NAME="openai/gpt-oss-20b"
-TEMPERATURE="0.1"
+MODEL_NAME="llama3.3-70B"
+TEMPERATURE="0.2"
 MAX_RETRIES="3"
-PROMPT_PATH="/satcom-synthetic-data-gen/synthetic_gen/prompts/qa_cosmosage_context.yaml"
-RESULTS_FILE=""
-N_DOCS="20"
-N_SHOTS="2"
+PROMPT_PATH="/satcom-synthetic-data-gen/synthetic_gen/prompts/"
+RESULTS_FILE="/gpfs/projects/<project_id>/myfolder/results/qa_radioeng_cz.jsonl"
 BACKEND="vllm"
-NUM_WORKERS="2"
+NUM_WORKERS="5"
 VLLM_URL="http://localhost:8000/v1"
 S3_BUCKET=""
-
-# Model loading mode (1 = offline, 0 = online)
-OFFLINE_MODE=1

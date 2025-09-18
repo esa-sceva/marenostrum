@@ -35,17 +35,31 @@ echo "Timestamp: \$(date)"
 
 module load singularity
 
-echo "Running GPT-OSS QA Generation with vLLM:"
+echo "Running Llama 3.3 70B QA Generation with vLLM:"
 echo "- Input source: $INPUT_SOURCE"
 echo "- Output destination: $OUTPUT_DESTINATION"
 echo "- Model: $MODEL_NAME"
 echo "- Backend: $BACKEND (vLLM)"
 
-# Run the GPT-OSS vLLM job using singularity
-singularity exec --nv container_2.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_gpt_oss_vllm.sh
+# Export ALL config variables so they're available in singularity
+export INPUT_SOURCE="$INPUT_SOURCE"
+export INPUT_TYPE="$INPUT_TYPE"
+export OUTPUT_DESTINATION="$OUTPUT_DESTINATION"
+export OUTPUT_TYPE="$OUTPUT_TYPE"
+export MODEL_NAME="$MODEL_NAME"
+export TEMPERATURE="$TEMPERATURE"
+export BACKEND="$BACKEND"
+export NUM_WORKERS="$NUM_WORKERS"
+export VLLM_URL="$VLLM_URL"
+export PROMPT_PATH="$PROMPT_PATH"
+export RESULTS_FILE="$RESULTS_FILE"
+export VLLM_LOG_FILE="slurm_out_generation/llama33_70b_vllm_\${SLURM_JOB_ID}_vllm_server.log"
+
+# Run the Llama 3.3 70B vLLM job using singularity
+singularity exec --nv container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_gpt_oss_vllm.sh
 EOF
 
-echo "Submitting GPT-OSS vLLM job..."
+echo "Submitting Llama 3.3 70B vLLM job..."
 echo "Configuration loaded from: $CONFIG_FILE"
 echo "Account: $ACCOUNT"
 echo "QOS: $QOS"
