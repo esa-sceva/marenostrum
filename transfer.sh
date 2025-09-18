@@ -13,33 +13,7 @@ RCLONE_CMD="rclone copy"
 
 # List of all folders
 AVAILABLE_FOLDERS=(
-mdpi_1
-mdpi_2
-mdpi_3
-mdpi_4
-mdpi_5
-mdpi_6
-mdpi_7
-mdpi_8
-mdpi_9
-mdpi_10
-mdpi_11
-mdpi_12
-mdpi_13
-mdpi_14
-mdpi_15
-mdpi_16
-mdpi_17
-mdpi_18
-mdpi_19
-mdpi_20
-mdpi_21
-mdpi_22
-mdpi_23
-mdpi_24
-mdpi_25
-mdpi_26
-mdpi_27
+wikipedia
 )
 
 
