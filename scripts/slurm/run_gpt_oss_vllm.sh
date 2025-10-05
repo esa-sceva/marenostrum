@@ -110,7 +110,7 @@ python -m synthetic_gen.generators.LLMGenerator \
     --prompt_path "$PROMPT_PATH" \
     --results_file "$RESULTS_FILE" \
     --multi_prompt_mode \
-    --prompt_probabilities '{"QA_generator_docs_prompt": 1.0, "qa_simple_prompt": 1.0, "ultraRM_prompt": 0.0}'
+    --prompt_probabilities '{"QA_generator_docs_prompt": 1.5, "qa_simple_prompt": 2, "ultraRM_prompt": 0.0, "grade_qas":0.0, "MCQAs_prompt": 0.75, "conversation_prompt": 1.0, "cot_prompt": 1.25}'
 
 
 EXIT_CODE=$?

@@ -62,7 +62,7 @@ export N_SHOTS="$N_SHOTS"
 export TEMPERATURE="$TEMPERATURE"
 export BACKEND="$BACKEND"
 export NUM_WORKERS="$NUM_WORKERS"
-export VLLM_LOG_FILE="slurm_out_evaluation/qwen2.5_72b_eval_\${SLURM_JOB_ID}_vllm_server.log"
+export VLLM_LOG_FILE="slurm_out_evaluation/mdpi_17_eval_\${SLURM_JOB_ID}_vllm_server.log"
 
 # Run the Qwen2.5 72B evaluation vLLM job using singularity
 singularity exec --nv container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_evaluation.sh

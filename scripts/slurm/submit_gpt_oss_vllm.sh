@@ -13,6 +13,7 @@ source "$CONFIG_FILE"
 # Create output directories
 mkdir -p "$(dirname "$OUT_FILE")"
 mkdir -p "$(dirname "$ERR_FILE")"
+mkdir -p "$(dirname "$VLLM_LOG_FILE")"
 
 # Create temporary SLURM script
 TMP_SLURM_SCRIPT=$(mktemp)
@@ -53,7 +54,7 @@ export NUM_WORKERS="$NUM_WORKERS"
 export VLLM_URL="$VLLM_URL"
 export PROMPT_PATH="$PROMPT_PATH"
 export RESULTS_FILE="$RESULTS_FILE"
-export VLLM_LOG_FILE="slurm_out_generation/llama33_70b_vllm_\${SLURM_JOB_ID}_vllm_server.log"
+export VLLM_LOG_FILE="slurm_out_generation/mdpi_17_vllm_\${SLURM_JOB_ID}_vllm_server.log"
 
 # Run the Llama 3.3 70B vLLM job using singularity
 singularity exec --nv container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_gpt_oss_vllm.sh
