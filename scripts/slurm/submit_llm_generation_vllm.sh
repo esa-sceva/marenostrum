@@ -2,8 +2,8 @@
 
 CONFIG_FILE="$1"
 if [[ -z "$CONFIG_FILE" ]]; then
-  echo "Usage: ./submit_gpt_oss_vllm.sh <job_config>"
-  echo "Example: ./submit_gpt_oss_vllm.sh configs/slurm_jobs/gpt_oss_vllm"
+  echo "Usage: ./submit_llm_generation_vllm.sh <job_config>"
+  echo "Example: ./submit_llm_generation_vllm.sh configs/slurm_jobs/llm_generation_vllm"
   exit 1
 fi
 
@@ -56,8 +56,8 @@ export PROMPT_PATH="$PROMPT_PATH"
 export RESULTS_FILE="$RESULTS_FILE"
 export VLLM_LOG_FILE="slurm_out_generation/mdpi_17_vllm_\${SLURM_JOB_ID}_vllm_server.log"
 
-# Run the Llama 3.3 70B vLLM job using singularity
-singularity exec --nv container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_gpt_oss_vllm.sh
+# Run the LLM generation vLLM job using singularity
+singularity exec --nv container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_llm_generation_vllm.sh
 EOF
 
 echo "Submitting Llama 3.3 70B vLLM job..."

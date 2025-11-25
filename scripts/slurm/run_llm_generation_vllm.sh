@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Script for running Llama 3.3 70B with vLLM server + LLMGenerator
+# Script for running LLM generation with vLLM server + LLMGenerator
+# Works with Llama, Mistral, Qwen models (70B+ models)
 # Simple approach: start vLLM server, then run LLMGenerator
 
-echo "Starting Llama 3.3 70B QA Generation with vLLM..."
+echo "Starting LLM QA Generation with vLLM..."
 
 # Activate the virtual environment
 VENV_PATH="/satcom-synthetic-data-gen/synthetic_gen/.venv"
@@ -121,9 +122,9 @@ kill $VLLM_PID 2>/dev/null
 wait $VLLM_PID 2>/dev/null
 
 if [ $EXIT_CODE -eq 0 ]; then
-    echo "Llama 3.3 70B QA generation completed successfully!"
+    echo "LLM QA generation completed successfully!"
 else
-    echo "Llama 3.3 70B QA generation failed with exit code $EXIT_CODE"
+    echo "LLM QA generation failed with exit code $EXIT_CODE"
 fi
 
 echo "vLLM server log saved to: $VLLM_LOG_FILE"

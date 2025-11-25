@@ -2,8 +2,8 @@
 
 CONFIG_FILE="$1"
 if [[ -z "$CONFIG_FILE" ]]; then
-  echo "Usage: ./submit_s3_chunk_eval.sh <job_config>"
-  echo "Example: ./submit_s3_chunk_eval.sh configs/slurm_jobs/s3_chunk_eval_upload"
+  echo "Usage: ./submit_chunk_evaluation.sh <job_config>"
+  echo "Example: ./submit_chunk_evaluation.sh configs/slurm_jobs/chunk_evaluation"
   exit 1
 fi
 
@@ -35,7 +35,7 @@ echo "Timestamp: \$(date)"
 
 module load singularity
 
-echo "Running s3_chunk_eval_upload with:"
+echo "Running chunk evaluation with:"
 echo "- Input source: $INPUT_SOURCE"
 echo "- Input type: $INPUT_TYPE"
 echo "- Prompt template: $PROMPT_TEMPLATE"
@@ -46,7 +46,7 @@ echo "- Max chunk size: $MAX_CHUNK_SIZE"
 echo "- Local JSON path: $LOCAL_JSON_PATH"
 echo "- Logs folder: $LOGS_FOLDER"
 
-# Run the s3_chunk_eval module using singularity with config variables
+# Run the chunk evaluation module using singularity with config variables
 singularity exec --nv \
     --env INPUT_SOURCE="$INPUT_SOURCE" \
     --env INPUT_TYPE="$INPUT_TYPE" \
@@ -58,10 +58,10 @@ singularity exec --nv \
     --env LOCAL_JSON_PATH="$LOCAL_JSON_PATH" \
     --env LOGS_FOLDER="$LOGS_FOLDER" \
     --env OFFLINE_MODE="$OFFLINE_MODE" \
-    container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_s3_chunk_eval.sh
+    container.sif /bin/bash /gpfs/projects/<project_id>/myfolder/scripts/slurm/run_chunk_evaluation.sh
 EOF
 
-echo "Submitting s3_chunk_eval_upload job..."
+echo "Submitting chunk evaluation job..."
 echo "Configuration loaded from: $CONFIG_FILE"
 echo "Account: $ACCOUNT"
 echo "QOS: $QOS"

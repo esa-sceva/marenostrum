@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Script for running s3_chunk_eval_upload module
+# Script for running chunk evaluation module
 # Uses fixed parameters instead of arguments to avoid quoting issues
 
-echo "Starting s3_chunk_eval_upload process..."
+echo "Starting chunk evaluation process..."
 
 # Activate the virtual environment created during container build
 VENV_PATH="/satcom-synthetic-data-gen/synthetic_gen/.venv"
@@ -58,7 +58,7 @@ else
 fi
 
 # Check if module is available now
-echo "Checking for s3_chunk_eval_upload module..."
+echo "Checking for s3_chunk_eval_upload module (chunk evaluation)..."
 python -c "import s3_chunk_eval_upload; print('Module found!')" || {
     echo "ERROR: s3_chunk_eval_upload module not found"
     echo "Python path: $PYTHONPATH"
@@ -150,7 +150,7 @@ GPU_MONITOR_PID=$!
 # Time the execution
 START_TIME=$(date +%s)
 
-echo "Running s3_chunk_eval_upload with parameters:"
+echo "Running chunk evaluation (s3_chunk_eval_upload) with parameters:"
 echo "- Input source: $INPUT_SOURCE"
 echo "- Input type: $INPUT_TYPE"
 echo "- Prompt template: $PROMPT_TEMPLATE"
@@ -183,9 +183,9 @@ echo "Total processing time: ${ELAPSED_TIME} seconds"
 kill $GPU_MONITOR_PID 2>/dev/null
 
 if [ $EXIT_CODE -eq 0 ]; then
-    echo "s3_chunk_eval_upload completed successfully!"
+    echo "Chunk evaluation completed successfully!"
 else
-    echo "s3_chunk_eval_upload failed with exit code $EXIT_CODE"
+    echo "Chunk evaluation failed with exit code $EXIT_CODE"
 fi
 
 exit $EXIT_CODE
