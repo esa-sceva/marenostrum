@@ -9,20 +9,13 @@ This repository provides job configurations and scripts for running synthetic da
 ```bash
 # File Transfer Node
 ssh <hpc_username>@transfer1.bsc.es
-ssh <hpc_username>@transfer2.bsc.es
 
 # Login Node (Job Submission)
 ssh <hpc_username>@alogin1.bsc.es
-ssh <hpc_username>@alogin2.bsc.es
 
 # Working Directory
 cd /gpfs/projects/<project_id>/satcom
 ```
-
-**Credentials:**
-- Username: `<hpc_username>`
-- Password: `<hpc_username>`
-- Project: `<project_id>`
 
 ## File Transfer
 
@@ -230,18 +223,7 @@ aws s3 cp ./project/hf_cache s3://<bucket-name>/model_name_hfcache --recursive
 rclone copy s3:<bucket-name>/model_name_hfcache/ bsc:/gpfs/projects/<project_id>/myfolder/model_name --progress -vv
 ```
 
-### Find Models on MareNostrum
 
-```bash
-# Find config files
-find /gpfs/projects/<project_id>/myfolder/ -name "config.json" | head -10
-
-# Find specific model
-find /gpfs/projects/<project_id>/myfolder/ -name "*llama*3.3*70B*" -type d
-
-# Check model structure
-ls -la /gpfs/projects/<project_id>/myfolder/llama_70B/models/
-```
 
 ## Troubleshooting
 
@@ -275,7 +257,6 @@ module load python
 nvidia-smi
 
 # Check disk quota
-quota -s
 bsc_quota  # BSC-specific quota command
 
 # Check computation hours usage
@@ -301,54 +282,6 @@ module list
 module unload python
 ```
 
-## Python/Environment
-
-### Virtual Environment (in container)
-
-```bash
-# Activate venv (done automatically in scripts)
-source /satcom-synthetic-data-gen/synthetic_gen/.venv/bin/activate
-
-# Check Python version
-python --version
-
-# Install package
-pip install package_name
-
-# List installed packages
-pip list
-```
-
-### HuggingFace Cache
-
-```bash
-# Set cache location
-export HF_HOME="/gpfs/projects/<project_id>/myfolder/hf_cache"
-export TRANSFORMERS_OFFLINE=1
-export HF_HUB_OFFLINE=1
-
-# Check cache contents
-ls -la $HF_HOME/models/
-```
-
-## AWS S3 (Direct)
-
-```bash
-# List buckets
-aws s3 ls
-
-# List bucket contents
-aws s3 ls s3://<bucket-name>/
-
-# Upload file
-aws s3 cp local_file.txt s3://<bucket-name>/path/
-
-# Upload directory
-aws s3 cp ./project/hf_cache s3://<bucket-name>/model_cache --recursive
-
-# Download file
-aws s3 cp s3://<bucket-name>/path/file.txt ./
-```
 
 ## Quick Workflows
 
@@ -392,68 +325,8 @@ rclone copy bsc:/gpfs/projects/<project_id>/myfolder/results/ s3:<bucket-name>/s
 scp -r <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/results/ ./local_results/
 ```
 
-### Emergency Cleanup
 
-```bash
-# Cancel all jobs
-scancel -u <hpc_username>
 
-# Check what's using space
-du -h --max-depth=1 /gpfs/projects/<project_id>/myfolder/ | sort -hr
-
-# Move to scratch
-mv /gpfs/projects/<project_id>/myfolder/large_data/ /gpfs/scratch/<project_id>/
-
-# Delete old logs
-rm slurm_out/mpi_*.out
-rm slurm_out/mpi_*.err
-```
-
-## BSC-Specific Commands
-
-MareNostrum provides specialized commands for resource management:
-
-```bash
-# Check storage quota (disk space)
-bsc_quota
-# Shows usage for:
-# - /gpfs/projects/<project_id>/ (project storage)
-# - /gpfs/scratch/<project_id>/ (scratch storage)
-
-# Check computation hours usage
-bsc_acct
-# Shows:
-# - GPU hours used
-# - CPU hours used
-# - Project allocation
-# - Remaining hours
-```
-
-## Useful Aliases
-
-Add these to your `~/.bashrc` on MareNostrum:
-
-```bash
-# Navigation
-alias satcom='cd /gpfs/projects/<project_id>/satcom'
-alias scratch='cd /gpfs/scratch/<project_id>/satcom'
-
-# Job management
-alias jobs='squeue -u <hpc_username>'
-alias jobinfo='scontrol show job'
-
-# Logs
-alias lasterr='ls -t slurm_out/*.err | head -1 | xargs tail -f'
-alias lastout='ls -t slurm_out/*.out | head -1 | xargs tail -f'
-
-# System
-alias gpu='nvidia-smi'
-alias space='du -h --max-depth=1 . | sort -hr'
-
-# BSC resources
-alias quota='bsc_quota'
-alias hours='bsc_acct'
-```
 
 ## Detailed Guides
 

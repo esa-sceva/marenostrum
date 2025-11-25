@@ -40,69 +40,66 @@ This repository provides **job configurations and scripts** to run synthetic dat
 ```
 satcom-marenostrum/
 ├── configs/
-│   ├── pipelines/              # Pipeline configurations for different tasks
-│   │   ├── llama/              # Llama-specific pipelines
-│   │   │   ├── qa.yaml
-│   │   │   ├── refusal_qa.yaml
-│   │   │   └── summarization.yaml
-│   │   ├── mistral/            # Mistral-specific pipelines
-│   │   ├── qwen/               # Qwen-specific pipelines
-│   │   └── single_hop_qa_w_bonus.yaml
+│   ├── slurm_jobs/                    # SLURM job configuration files
+│   │   ├── llm_generation_vllm        # LLM generation with vLLM config
+│   │   ├── chunk_evaluation           # Document chunk evaluation config
+│   │   ├── evaluation                 # Q&A grading/evaluation config
+│   │   └── template/                  # Template configurations
+│   │       ├── multi_node             # Multi-node job template
+│   │       └── single_node            # Single-node job template
 │   │
-│   ├── slurm_jobs/             # SLURM job configuration files
-│   │   ├── llm_generation_vllm # LLM generation with vLLM
-│   │   ├── chunk_evaluation    # Document chunk evaluation
-│   │   ├── evaluation          # Model evaluation jobs
-│   │   ├── llama/              # Llama model job configs
-│   │   ├── mistral/            # Mistral model job configs
-│   │   ├── qwen/               # Qwen model job configs
-│   │   └── template/           # Template configurations
-│   │
-│   └── vllm_configs/           # vLLM server configurations
-│       ├── llama3.3_70B.yaml
-│       ├── mistral_large.yaml
-│       ├── qwen72B.yaml
-│       └── ...
+│   └── vllm_configs/                  # vLLM server configurations
+│       ├── llama3.3_70B.yaml          # Llama 3.3 70B config
+│       ├── llama_3.yaml               # Llama 3 config
+│       ├── mistral_large.yaml         # Mistral Large config
+│       ├── mistral_small.yaml         # Mistral Small config
+│       ├── qwen72B.yaml               # Qwen 72B config
+│       └── qwen3.yaml                 # Qwen 3 config
 │
 ├── scripts/
-│   ├── huggingface/               # HuggingFace model management
-│   │   ├── download_hf_assets.py  # Download models and datasets
-│   │   ├── deploy.sh              # Deploy models to HPC
-│   │   ├── hf_resources.yaml      # Model/dataset specifications
-│   │   └── requirements.txt
+│   ├── huggingface/                   # HuggingFace model management
+│   │   ├── download_hf_assets.py      # Download models and datasets
+│   │   ├── deploy.sh                  # Deploy models to HPC
+│   │   ├── hf_resources.yaml          # Model/dataset specifications
+│   │   └── requirements.txt           # Python requirements
 │   │
-│   ├── singularity/               # Container definitions
+│   ├── singularity/                   # Container definitions
 │   │   ├── definition_files/
-│   │   │   └── satcom_synth_data_gen.def
-│   │   └── install_singularity.sh
+│   │   │   └── satcom_synth_data_gen.def  # Singularity container definition
+│   │   └── install_singularity.sh     # Singularity installation script
 │   │
-│   ├── slurm/                     # SLURM job scripts
+│   ├── slurm/                         # SLURM job scripts
 │   │   ├── submit_llm_generation_vllm.sh  # Submit LLM generation jobs
 │   │   ├── run_llm_generation_vllm.sh     # Run LLM generation with vLLM
+│   │   ├── submit_evaluation.sh           # Submit Q&A grading jobs
+│   │   ├── run_evaluation.sh              # Run Q&A grading
 │   │   ├── submit_chunk_evaluation.sh     # Submit chunk evaluation jobs
 │   │   ├── run_chunk_evaluation.sh        # Run chunk evaluation
 │   │   ├── submit_job.sh                  # Generic job submission
-│   │   └── run.sh                         # Generic job runner
+│   │   ├── run.sh                         # Generic job runner
+│   │   ├── test_submit.sh                 # Test job submission
+│   │   └── slurm_submission               # SLURM submission template
 │   │
-│   ├── slurm_multinode/        # Multi-node job scripts
-│   │   ├── submit_multi_node_job.sh
-│   │   ├── run_cluster.sh
-│   │   └── check_GPUs.sh
-│   │
-│   └── run_jobs.py             # Batch job submission utility
+│   └── slurm_multinode/               # Multi-node job scripts
+│       ├── submit_multi_node_job.sh   # Submit multi-node jobs
+│       ├── run_cluster.sh             # Run on cluster
+│       ├── run.sh                     # Multi-node runner
+│       └── check_GPUs.sh              # GPU availability checker
 │
-├── transfer/                   # Data transfer utilities
-│   ├── transfer.sh             # S3 → MareNostrum (interactive)
-│   ├── transfer_to_s3.sh       # MareNostrum → S3 (optimized)
-│   └── simple_move.sh          # Move between project/scratch storage
+├── transfer/                          # Data transfer utilities
+│   ├── README.md                      # Transfer utilities documentation
+│   ├── transfer.sh                    # S3 → MareNostrum (interactive)
+│   ├── transfer_to_s3.sh              # MareNostrum → S3 (optimized)
+│   └── simple_move.sh                 # Move between folders on HPC
 │
 ├── docs/                              # Documentation
 │   ├── llm_generation_vllm_setup.md   # LLM generation setup guide
 │   ├── chunk_evaluation_setup.md      # Chunk evaluation setup guide
-│   └── evaluation_setup.md            # Evaluation setup guide
+│   └── evaluation_setup.md            # Q&A grading setup guide
 │
+├── .gitignore                         # Git ignore rules
 ├── COMMANDS.md                        # Quick command reference
-└── README.md                                     
+└── README.md                          # This file
 ```
 
 ## Prerequisites
