@@ -91,6 +91,11 @@ satcom-marenostrum/
 │   │
 │   └── run_jobs.py             # Batch job submission utility
 │
+├── transfer/                   # Data transfer utilities
+│   ├── transfer.sh             # S3 → MareNostrum (interactive)
+│   ├── transfer_to_s3.sh       # MareNostrum → S3 (optimized)
+│   └── simple_move.sh          # Move between project/scratch storage
+│
 ├── docs/                              # Documentation
 │   ├── llm_generation_vllm_setup.md   # LLM generation setup guide
 │   ├── chunk_evaluation_setup.md      # Chunk evaluation setup guide
@@ -384,7 +389,16 @@ rclone copy bsc:/gpfs/projects/<project_id>/myfolder/results/ s3:<bucket-name>/s
 rclone copy s3:<bucket-name>/data/ bsc:/gpfs/projects/<project_id>/myfolder/data/ --progress -vv
 ```
 
-See **[COMMANDS.md](COMMANDS.md)** for more file transfer examples.
+### Transfer Utility Scripts
+
+This repository includes helper scripts in the `transfer/` directory for common transfer operations:
+
+- **`transfer.sh`**: Download files from S3 to MareNostrum (interactive, with folder selection)
+- **`transfer_to_s3.sh`**: Upload results from MareNostrum to S3 (optimized for large transfers)
+- **`simple_move.sh`**: Move data between folders on MareNostrum
+
+See **[transfer/README.md](transfer/README.md)** for detailed usage instructions.
+
 
 ## Quick Command Reference
 

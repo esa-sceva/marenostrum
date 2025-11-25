@@ -276,6 +276,10 @@ nvidia-smi
 
 # Check disk quota
 quota -s
+bsc_quota  # BSC-specific quota command
+
+# Check computation hours usage
+bsc_acct   # BSC account usage (GPU hours, etc.)
 
 # Check available resources
 sinfo
@@ -405,6 +409,26 @@ rm slurm_out/mpi_*.out
 rm slurm_out/mpi_*.err
 ```
 
+## BSC-Specific Commands
+
+MareNostrum provides specialized commands for resource management:
+
+```bash
+# Check storage quota (disk space)
+bsc_quota
+# Shows usage for:
+# - /gpfs/projects/<project_id>/ (project storage)
+# - /gpfs/scratch/<project_id>/ (scratch storage)
+
+# Check computation hours usage
+bsc_acct
+# Shows:
+# - GPU hours used
+# - CPU hours used
+# - Project allocation
+# - Remaining hours
+```
+
 ## Useful Aliases
 
 Add these to your `~/.bashrc` on MareNostrum:
@@ -425,6 +449,10 @@ alias lastout='ls -t slurm_out/*.out | head -1 | xargs tail -f'
 # System
 alias gpu='nvidia-smi'
 alias space='du -h --max-depth=1 . | sort -hr'
+
+# BSC resources
+alias quota='bsc_quota'
+alias hours='bsc_acct'
 ```
 
 ## Detailed Guides
@@ -444,5 +472,5 @@ For comprehensive setup and usage instructions, see:
 
 - **BSC Support**: https://www.bsc.es/user-support
 - **SLURM Documentation**: https://slurm.schedmd.com/
-- **Project Team**: [your contact info]
+- **Project Team**: https://github.com/esa-sceva
 

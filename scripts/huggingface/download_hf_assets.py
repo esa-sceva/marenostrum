@@ -25,7 +25,7 @@ def main(config_file: str):
     os.environ["HF_XET_CACHE"] = os.path.join(hf_cache_dir, "xet")
 
     # === Download models ===
-    print("🔄 Downloading models...")
+    print("Downloading models...")
     for model_id in models:
         print(f" -> {model_id}")
         snapshot_download(
@@ -34,7 +34,7 @@ def main(config_file: str):
         )
 
     # === Download datasets ===
-    print("\n🔄 Downloading datasets...")
+    print("\nDownloading datasets...")
     for ds in datasets:
         name = ds["name"]
         subset = ds.get("subset")
@@ -46,9 +46,9 @@ def main(config_file: str):
                 cache_dir=os.environ["HF_DATASETS_CACHE"]
             )
         except Exception as e:
-            print(f"   ⚠️ Failed: {e}")
+            print(f"Failed: {e}")
 
-    print("\n✅ Done! Cache is in:", hf_cache_dir)
+    print("\nDone! Cache is in:", hf_cache_dir)
 
 if __name__ == "__main__":
     main()

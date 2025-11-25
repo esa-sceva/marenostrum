@@ -35,7 +35,7 @@ echo
 eval "$CMD"
 
 if [ $? -eq 0 ]; then
-    echo -e "\n✅ Upload completed successfully."
+    echo -e "\nUpload completed successfully."
 else
-    echo -e "\n❌ Upload failed."
+    echo -e "\nUpload failed."
 fi
