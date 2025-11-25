@@ -1,0 +1,31 @@
+# SLURM directives for Qwen2.5 72B Evaluation with vLLM
+JOB_NAME=wikipedia  
+WORK_DIR=.
+OUT_FILE=slurm_out_evaluation/wikipedia_eval_%j.out
+ERR_FILE=slurm_out_evaluation/wikipedia_eval_%j.err
+VLLM_LOG_FILE=slurm_out_evaluation/wikipedia_eval_%j_vllm_server.log
+NTASKS=1
+CPUS_PER_TASK=80
+TIME=12:00:00
+GRES=gpu:4
+
+# SLURM submission options
+ACCOUNT=<project_id>
+QOS=acc_ehpc
+
+# Job-specific arguments for Qwen2.5 72B Evaluation vLLM
+MODEL_NAME="qwen2.5-72b"
+DATASET_PATH="/gpfs/projects/<project_id>/myfolder/results/qa_wikipedia.jsonl"
+RESULTS_PATH="/gpfs/projects/<project_id>/myfolder/grades/qa_grades_wikipedia.jsonl"
+OUTPUT_PATH="/gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_wikipedia.jsonl"
+PROMPT_PATH="/satcom-synthetic-data-gen/synthetic_gen/prompts/grade_qas.yaml"
+THRESHOLD="4"
+PERTINENCE_THRESHOLD="4"
+CONTEXTUAL_RELEVANCE_THRESHOLD="4"
+CORRECTNESS_THRESHOLD="4"
+FILTER_LOGIC="AND"
+N_DOCS="-1"
+N_SHOTS="4"
+TEMPERATURE="0.25"
+BACKEND="vllm"
+NUM_WORKERS="12"

@@ -1,0 +1,32 @@
+# SLURM directives for Question Generation with vLLM
+JOB_NAME=wikipedia
+WORK_DIR=.
+OUT_FILE=slurm_out_generation_question/wikipedia_%j.out
+ERR_FILE=slurm_out_generation_question/wikipedia_%j.err
+VLLM_LOG_FILE=slurm_out_generation_question/wikipedia_%j_vllm_server.log
+NTASKS=1
+CPUS_PER_TASK=80
+TIME=12:00:00
+GRES=gpu:4
+
+# SLURM submission options
+ACCOUNT=<project_id>
+QOS=acc_ehpc
+
+# Job-specific arguments for Question Generation
+MODEL_NAME="llama3.3-70B"
+INPUT_SOURCE="/gpfs/scratch/<project_id>/myfolder/data/wikipedia/"
+INPUT_TYPE="local"
+OUTPUT_DESTINATION="/gpfs/projects/<project_id>/myfolder/questions"
+OUTPUT_TYPE="local"
+PROMPT_PATH="/satcom-synthetic-data-gen/synthetic_gen/generators/prompts/question_cot_gen.yaml"
+MULTI_PROMPT_MODE="true"
+RESULTS_FILE="/gpfs/projects/<project_id>/myfolder/questions/wikipedia.jsonl"
+N_DOCS="-1"
+N_SHOTS="3"
+TEMPERATURE="0.1"
+MAX_RETRIES="3"
+BACKEND="vllm"
+NUM_WORKERS="8"
+VLLM_URL="http://localhost:8000/v1"
+S3_BUCKET=""

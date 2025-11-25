@@ -1,9 +1,9 @@
 # SLURM directives for Llama 3.3 70B with vLLM
-JOB_NAME=mdpi_17
+JOB_NAME=wikipedia
 WORK_DIR=.
-OUT_FILE=slurm_out_generation/mdpi_17_vllm_%j.out
-ERR_FILE=slurm_out_generation/mdpi_17_vllm_%j.err
-VLLM_LOG_FILE=slurm_out_generation/mdpi_17_vllm_%j_vllm_server.log
+OUT_FILE=slurm_out_generation/wikipedia_vllm_%j.out
+ERR_FILE=slurm_out_generation/wikipedia_vllm_%j.err
+VLLM_LOG_FILE=slurm_out_generation/wikipedia_vllm_%j_vllm_server.log
 NTASKS=1
 CPUS_PER_TASK=80
 TIME=12:00:00
@@ -14,7 +14,7 @@ ACCOUNT=<project_id>
 QOS=acc_ehpc
 
 # Job-specific arguments for Llama 3.3 70B vLLM
-INPUT_SOURCE="/gpfs/scratch/<project_id>/myfolder/data/mdpi_17/"
+INPUT_SOURCE="/gpfs/scratch/<project_id>/myfolder/data/wikipedia/"
 INPUT_TYPE="local"
 OUTPUT_DESTINATION="/gpfs/projects/<project_id>/myfolder/results"
 OUTPUT_TYPE="local"
@@ -22,7 +22,7 @@ MODEL_NAME="llama3.3-70B"
 TEMPERATURE="0.25"
 MAX_RETRIES="3"
 PROMPT_PATH="/satcom-synthetic-data-gen/synthetic_gen/prompts/"
-RESULTS_FILE="/gpfs/projects/<project_id>/myfolder/results/qa_mdpi_17.jsonl"
+RESULTS_FILE="/gpfs/projects/<project_id>/myfolder/results/qa_wikipedia.jsonl"
 BACKEND="vllm"
 NUM_WORKERS="8"
 VLLM_URL="http://localhost:8000/v1"

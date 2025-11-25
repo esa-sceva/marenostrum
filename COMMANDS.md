@@ -32,9 +32,9 @@ scp -r local_directory/ <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_
 scp <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/results/output.jsonl ./
 
 # Upload specific config files
-scp configs/slurm_jobs/chunk_evaluation <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/configs/slurm_jobs/
-scp scripts/slurm/run_chunk_evaluation.sh <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/scripts/slurm/
-scp scripts/slurm/submit_chunk_evaluation.sh <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/scripts/slurm/
+scp configs/slurm_jobs/evaluation/chunk/chunk_evaluation <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/configs/slurm_jobs/evaluation/chunk/
+scp scripts/slurm/evaluation/chunk/run_chunk_evaluation.sh <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/scripts/slurm/evaluation/chunk/
+scp scripts/slurm/evaluation/chunk/submit_chunk_evaluation.sh <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/scripts/slurm/evaluation/chunk/
 ```
 
 ### rclone (Large Transfers)
@@ -45,12 +45,6 @@ rclone copy s3:<bucket-name>/path/ bsc:/gpfs/projects/<project_id>/myfolder/path
 
 # MareNostrum to S3
 rclone copy bsc:/gpfs/projects/<project_id>/myfolder/results/ s3:<bucket-name>/synthetic-data-gen/results/ --progress -vv --checksum
-
-# Specific examples
-rclone copy s3:<bucket-name>/qwen25_72B_hfcache/ bsc:/gpfs/projects/<project_id>/myfolder/qwen_72B --progress -vv
-rclone copy s3:<bucket-name>/sample-synthetic-data-gen/ bsc:/gpfs/projects/<project_id>/myfolder/sample_dataset --progress -vv
-rclone copy bsc:/gpfs/projects/<project_id>/myfolder/grades/ s3:<bucket-name>/synthetic-data-gen/grades/ --progress -vv
-rclone copy bsc:/gpfs/projects/<project_id>/myfolder/questions/arxiv_1.jsonl s3:<bucket-name>/synthetic-data-gen/dataset/questions/ --progress -vv
 ```
 
 ## Job Management
@@ -58,17 +52,21 @@ rclone copy bsc:/gpfs/projects/<project_id>/myfolder/questions/arxiv_1.jsonl s3:
 ### Submit Jobs
 
 ```bash
-# LLM Generation with vLLM
-./scripts/slurm/submit_llm_generation_vllm.sh configs/slurm_jobs/llm_generation_vllm
+# Direct LLM Generation with vLLM
+./scripts/slurm/generation/llm/submit_vllm_generation.sh configs/slurm_jobs/generation/vllm_generation
+
+# Two-Stage Q&A Generation
+./scripts/slurm/generation/qa/submit_questions.sh configs/slurm_jobs/generation/qa/questions  # Stage 1
+./scripts/slurm/generation/qa/submit_answers.sh configs/slurm_jobs/generation/qa/answers      # Stage 2
 
 # Chunk Evaluation
-./scripts/slurm/submit_chunk_evaluation.sh configs/slurm_jobs/chunk_evaluation
+./scripts/slurm/evaluation/chunk/submit_chunk_evaluation.sh configs/slurm_jobs/evaluation/chunk/chunk_evaluation
 
-# Evaluation (Quality Assessment)
-./scripts/slurm/submit_evaluation.sh configs/slurm_jobs/evaluation
+# Q&A Curation (Quality Grading)
+./scripts/slurm/evaluation/qa_curation/submit_evaluation.sh configs/slurm_jobs/evaluation/qa_curation/evaluation
 
 # Generic job submission
-./scripts/slurm/submit_job.sh configs/slurm_jobs/your_config
+./scripts/slurm/template/submit_job.sh configs/slurm_jobs/your_config
 ```
 
 ### Monitor Jobs
@@ -230,17 +228,26 @@ rclone copy s3:<bucket-name>/model_name_hfcache/ bsc:/gpfs/projects/<project_id>
 ### Fix Line Endings (Windows → Linux)
 
 ```bash
-sed -i 's/\r$//' configs/slurm_jobs/chunk_evaluation
-sed -i 's/\r$//' scripts/slurm/run_chunk_evaluation.sh
-sed -i 's/\r$//' scripts/slurm/submit_chunk_evaluation.sh
+# Fix all config files
+find configs/slurm_jobs -type f -exec sed -i 's/\r$//' {} \;
+
+# Fix all script files
+find scripts/slurm -name "*.sh" -exec sed -i 's/\r$//' {} \;
+
+# Or fix specific files
+sed -i 's/\r$//' configs/slurm_jobs/generation/vllm_generation
+sed -i 's/\r$//' scripts/slurm/generation/llm/run_vllm_generation.sh
+sed -i 's/\r$//' scripts/slurm/generation/llm/submit_vllm_generation.sh
 ```
 
 ### Fix Permissions
 
 ```bash
-# Make scripts executable
-chmod +x scripts/slurm/*.sh
+# Make all scripts executable
+find scripts/slurm -name "*.sh" -exec chmod +x {} \;
 chmod +x scripts/huggingface/*.sh
+chmod +x scripts/singularity/*.sh
+chmod +x transfer/*.sh
 
 # Fix directory permissions
 chmod u+rwx $HOME/projects/synthetic_output
@@ -327,6 +334,16 @@ scp -r <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/resu
 
 
 
+
+## Job Types Overview
+
+### Generation Jobs
+- **Direct vLLM Generation**: Single-stage Q&A generation from documents
+- **Two-Stage Q&A**: Questions first, then answers (more controlled)
+
+### Evaluation Jobs
+- **Chunk Evaluation**: Pre-filter document chunks by quality
+- **Q&A Curation**: Grade and filter generated Q&A pairs
 
 ## Detailed Guides
 

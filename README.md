@@ -41,9 +41,18 @@ This repository provides **job configurations and scripts** to run synthetic dat
 satcom-marenostrum/
 ├── configs/
 │   ├── slurm_jobs/                    # SLURM job configuration files
-│   │   ├── llm_generation_vllm        # LLM generation with vLLM config
-│   │   ├── chunk_evaluation           # Document chunk evaluation config
-│   │   ├── evaluation                 # Q&A grading/evaluation config
+│   │   ├── generation/                # Generation job configs
+│   │   │   ├── vllm_generation        # Direct LLM generation with vLLM
+│   │   │   └── qa/                    # Two-stage Q&A generation
+│   │   │       ├── questions          # Stage 1: Generate questions
+│   │   │       └── answers            # Stage 2: Generate answers
+│   │   │
+│   │   ├── evaluation/                # Evaluation job configs
+│   │   │   ├── chunk/                 # Document chunking and evaluation
+│   │   │   │   └── chunk_evaluation
+│   │   │   └── qa_curation/           # Q&A quality grading/curation
+│   │   │       └── evaluation
+│   │   │
 │   │   └── template/                  # Template configurations
 │   │       ├── multi_node             # Multi-node job template
 │   │       └── single_node            # Single-node job template
@@ -61,24 +70,37 @@ satcom-marenostrum/
 │   │   ├── download_hf_assets.py      # Download models and datasets
 │   │   ├── deploy.sh                  # Deploy models to HPC
 │   │   ├── hf_resources.yaml          # Model/dataset specifications
-│   │   └── requirements.txt           # Python requirements
+│   │   └── requirements.txt           # Requirements
 │   │
 │   ├── singularity/                   # Container definitions
 │   │   ├── definition_files/
 │   │   │   └── satcom_synth_data_gen.def  # Singularity container definition
 │   │   └── install_singularity.sh     # Singularity installation script
 │   │
-│   ├── slurm/                         # SLURM job scripts
-│   │   ├── submit_llm_generation_vllm.sh  # Submit LLM generation jobs
-│   │   ├── run_llm_generation_vllm.sh     # Run LLM generation with vLLM
-│   │   ├── submit_evaluation.sh           # Submit Q&A grading jobs
-│   │   ├── run_evaluation.sh              # Run Q&A grading
-│   │   ├── submit_chunk_evaluation.sh     # Submit chunk evaluation jobs
-│   │   ├── run_chunk_evaluation.sh        # Run chunk evaluation
-│   │   ├── submit_job.sh                  # Generic job submission
-│   │   ├── run.sh                         # Generic job runner
-│   │   ├── test_submit.sh                 # Test job submission
-│   │   └── slurm_submission               # SLURM submission template
+│   ├── slurm/                         # SLURM job scripts (organized by type)
+│   │   ├── generation/                # Generation scripts
+│   │   │   ├── llm/                   # Direct LLM generation
+│   │   │   │   ├── submit_vllm_generation.sh
+│   │   │   │   └── run_vllm_generation.sh
+│   │   │   └── qa/                      # Two-stage Q&A generation
+│   │   │       ├── submit_questions.sh  # Generate questions first
+│   │   │       ├── run_questions.sh
+│   │   │       ├── submit_answers.sh    # Generate answers from questions+docs
+│   │   │       └── run_answers.sh
+│   │   │
+│   │   ├── evaluation/                # Evaluation scripts
+│   │   │   ├── chunk/                 # Document chunk evaluation
+│   │   │   │   ├── submit_chunk_evaluation.sh
+│   │   │   │   └── run_chunk_evaluation.sh
+│   │   │   └── qa_curation/           # Q&A quality grading/curation
+│   │   │       ├── submit_evaluation.sh
+│   │   │       └── run_evaluation.sh
+│   │   │
+│   │   └── template/                  # Template/utility scripts
+│   │       ├── submit_job.sh          # Generic job submission
+│   │       ├── run.sh                 # Generic job runner
+│   │       ├── test_submit.sh         # Test job submission
+│   │       └── slurm_submission       # SLURM submission template
 │   │
 │   └── slurm_multinode/               # Multi-node job scripts
 │       ├── submit_multi_node_job.sh   # Submit multi-node jobs
@@ -88,8 +110,8 @@ satcom-marenostrum/
 │
 ├── transfer/                          # Data transfer utilities
 │   ├── README.md                      # Transfer utilities documentation
-│   ├── transfer.sh                    # S3 → MareNostrum (interactive)
-│   ├── transfer_to_s3.sh              # MareNostrum → S3 (optimized)
+│   ├── transfer.sh                    # S3 → MareNostrum
+│   ├── transfer_to_s3.sh              # MareNostrum → S3
 │   └── simple_move.sh                 # Move between folders on HPC
 │
 ├── docs/                              # Documentation
@@ -107,7 +129,7 @@ satcom-marenostrum/
 ### Access Requirements
 
 - **BSC Account**: Username and project allocation (e.g., `<hpc_username>`, project `<project_id>`)
-- **SSH Access**: To `transfer1.bsc.es` (file transfer) and `alogin2.bsc.es` (job submission)
+- **SSH Access**: To `transfer1.bsc.es` (file transfer) and `alogin1.bsc.es` (job submission)
 - **S3 Credentials**: For data storage (AWS S3 compatible)
 
 ### Software Requirements
@@ -251,74 +273,115 @@ rclone copy s3:<bucket-name>/model_name_hfcache/ bsc:/gpfs/projects/<project_id>
 
 ## Running Jobs
 
-This repository supports three main types of jobs for the synthetic data generation pipeline:
+This repository supports two main categories of jobs: **Generation** and **Evaluation**
 
-### 1. LLM Generation Jobs (vLLM)
+### Generation Jobs
 
-Generate synthetic Q&A data using large language models with high-performance vLLM inference.
+#### 1. Direct LLM QAs Generation 
+
+Generate synthetic Q&A data directly from documents using large language models with high-performance vLLM inference.
 
 **Quick Start:**
 ```bash
 # Edit configuration
-nano configs/slurm_jobs/llm_generation_vllm
+nano configs/slurm_jobs/generation/vllm_generation
 
 # Submit job
-./scripts/slurm/submit_llm_generation_vllm.sh configs/slurm_jobs/llm_generation_vllm
+./scripts/slurm/generation/llm/submit_vllm_generation.sh configs/slurm_jobs/generation/vllm_generation
 
 # Monitor
 squeue -u <hpc_username>
 tail -f slurm_out_generation/*_vllm_*.out
 ```
 
+**Use Case:** Direct Q&A generation from documents  
 **Supported Models:** Llama 3.3 70B, Mistral Large/Small, Qwen 72B  
-**Resource Requirements:** 4 GPUs for 70B models, 2 GPUs for smaller models  
+**Resource Requirements:** 4 GPUs for 70B models, 1/2 GPUs for smaller models  
 
 📖 **[Complete Guide: LLM Generation with vLLM](docs/llm_generation_vllm_setup.md)**
 
-### 2. Chunk Evaluation Jobs
+#### 2. Two-Stage Q&A Generation
 
-Chunk and score document chunks using reward models (UltraRM) to filter high-quality content.
+A two-stage pipeline that first generates questions from documents, then generates answers based on those questions and source documents.
+
+**Stage 1 - Generate Questions:**
+```bash
+# Edit configuration
+nano configs/slurm_jobs/generation/qa/questions
+
+# Submit question generation job
+./scripts/slurm/generation/qa/submit_questions.sh configs/slurm_jobs/generation/qa/questions
+
+# Monitor
+squeue -u <hpc_username>
+tail -f slurm_out_generation/*_questions_*.out
+```
+
+**Stage 2 - Generate Answers:**
+```bash
+# Edit configuration (uses questions from Stage 1)
+nano configs/slurm_jobs/generation/qa/answers
+
+# Submit answer generation job
+./scripts/slurm/generation/qa/submit_answers.sh configs/slurm_jobs/generation/qa/answers
+
+# Monitor
+squeue -u <hpc_username>
+tail -f slurm_out_generation/*_answers_*.out
+```
+
+**Use Case:** More controlled Q&A generation with separate question and answer stages  
+**Pipeline:** Documents → Questions → Questions + Documents → Answers  
+**Resource Requirements:** 4 GPUs for 70B models per stage
+
+📖 **[Complete Guide: LLM Generation with vLLM](docs/llm_generation_vllm_setup.md)**
+
+### Evaluation Jobs
+
+#### 1. Chunk Evaluation
+
+Chunk and score documents using hierarchical chunking and reward models (UltraRM) to filter high-quality content before generation.
 
 **Quick Start:**
 ```bash
 # Edit configuration
-nano configs/slurm_jobs/chunk_evaluation
+nano configs/slurm_jobs/evaluation/chunk/chunk_evaluation
 
 # Submit job
-./scripts/slurm/submit_chunk_evaluation.sh configs/slurm_jobs/chunk_evaluation
+./scripts/slurm/evaluation/chunk/submit_chunk_evaluation.sh configs/slurm_jobs/evaluation/chunk/chunk_evaluation
 
 # Monitor
 squeue -u <hpc_username>
 tail -f slurm_out/chunk_eval_*.out
 ```
 
-**Purpose:** Pre-process documents, score quality, filter content  
+**Use Case:** Pre-filter documents, remove low-quality chunks  
 **Resource Requirements:** 1 GPU, 20 CPUs  
-**Typical Runtime:** 2-10 hours depending on dataset size
 
 📖 **[Complete Guide: Chunk Evaluation](docs/chunk_evaluation_setup.md)**
 
-### 3. Evaluation Jobs (Q&A Grading)
+#### 2. Q&A Curation (Quality Grading)
 
-Use grading models to evaluate and score generated Q&A pairs during the synthetic data generation process.
+Evaluate and grade generated Q&A pairs using LLM-as-judge to filter high-quality synthetic data.
 
 **Quick Start:**
 ```bash
 # Edit configuration
-nano configs/slurm_jobs/evaluation
+nano configs/slurm_jobs/evaluation/qa_curation/evaluation
 
 # Submit job
-./scripts/slurm/submit_evaluation.sh configs/slurm_jobs/evaluation
+./scripts/slurm/evaluation/qa_curation/submit_evaluation.sh configs/slurm_jobs/evaluation/qa_curation/evaluation
 
 # Monitor
 squeue -u <hpc_username>
-tail -f slurm_out/evaluation_*.out
+tail -f slurm_out_evaluation/evaluation_*.out
 ```
 
-**Purpose:** Grade Q&A quality using models (e.g., reward models, LLM-as-judge)  
-**Resource Requirements:**  4 GPUs for 70B models, 2 GPUs for smaller models.
+**Use Case:** Grade Q&A quality, filter low-quality pairs  
+**Grading Dimensions:** Pertinence, Contextual Relevance, Correctness  
+**Resource Requirements:** 4 GPUs for 70B models, 2 GPUs for smaller models
 
-📖 **[Complete Guide: Evaluation Setup](docs/evaluation_setup.md)**
+📖 **[Complete Guide: Q&A Grading](docs/evaluation_setup.md)**
 
 
 ## Monitoring Jobs
@@ -404,10 +467,14 @@ For a comprehensive list of commands, see **[COMMANDS.md](COMMANDS.md)**
 ### Essential Commands
 
 ```bash
-# Submit jobs
-./scripts/slurm/submit_llm_generation_vllm.sh configs/slurm_jobs/llm_generation_vllm
-./scripts/slurm/submit_chunk_evaluation.sh configs/slurm_jobs/chunk_evaluation
-./scripts/slurm/submit_evaluation.sh configs/slurm_jobs/evaluation
+# Submit generation jobs
+./scripts/slurm/generation/llm/submit_vllm_generation.sh configs/slurm_jobs/generation/vllm_generation
+./scripts/slurm/generation/qa/submit_questions.sh configs/slurm_jobs/generation/qa/questions
+./scripts/slurm/generation/qa/submit_answers.sh configs/slurm_jobs/generation/qa/answers
+
+# Submit evaluation jobs
+./scripts/slurm/evaluation/chunk/submit_chunk_evaluation.sh configs/slurm_jobs/evaluation/chunk/chunk_evaluation
+./scripts/slurm/evaluation/qa_curation/submit_evaluation.sh configs/slurm_jobs/evaluation/qa_curation/evaluation
 
 # Monitor jobs
 squeue -u <hpc_username>
@@ -418,8 +485,8 @@ scp -r . <hpc_username>@transfer1.bsc.es:/gpfs/projects/<project_id>/myfolder/
 rclone copy bsc:/gpfs/projects/<project_id>/myfolder/results/ s3:<bucket-name>/ --progress -vv
 
 # Fix line endings (Windows)
-sed -i 's/\r$//' configs/slurm_jobs/*
-sed -i 's/\r$//' scripts/slurm/*.sh
+find configs/slurm_jobs -type f -exec sed -i 's/\r$//' {} \;
+find scripts/slurm -name "*.sh" -exec sed -i 's/\r$//' {} \;
 ```
 
 ## Troubleshooting

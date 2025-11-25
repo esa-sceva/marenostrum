@@ -8,13 +8,13 @@ This guide explains how to run chunk evaluation jobs on MareNostrum using the SL
 
 The chunk evaluation jobs (module internally named `chunk_evaluation`) process document chunks and evaluate them using reward models (such as UltraRM) to score their quality. This is useful for filtering high-quality content for synthetic data generation.
 
-## Files Created
+## Files
 
 The following files support running chunk evaluation:
 
-1. **Job Configuration**: `configs/slurm_jobs/chunk_evaluation`
-2. **Run Script**: `scripts/slurm/run_chunk_evaluation.sh`
-3. **Submission Script**: `scripts/slurm/submit_chunk_evaluation.sh`
+1. **Job Configuration**: `configs/slurm_jobs/evaluation/chunk/chunk_evaluation`
+2. **Run Script**: `scripts/slurm/evaluation/chunk/run_chunk_evaluation.sh`
+3. **Submission Script**: `scripts/slurm/evaluation/chunk/submit_chunk_evaluation.sh`
 
 ## Usage
 
@@ -23,7 +23,7 @@ The following files support running chunk evaluation:
 Edit the job configuration file if needed:
 
 ```bash
-nano configs/slurm_jobs/chunk_evaluation
+nano configs/slurm_jobs/evaluation/chunk/chunk_evaluation
 ```
 
 Key parameters you might want to adjust:
@@ -45,7 +45,7 @@ Key parameters you might want to adjust:
 Run the submission script:
 
 ```bash
-./scripts/slurm/submit_chunk_evaluation.sh configs/slurm_jobs/chunk_evaluation
+./scripts/slurm/evaluation/chunk/submit_chunk_evaluation.sh configs/slurm_jobs/evaluation/chunk/chunk_evaluation
 ```
 
 ### Step 3: Monitor the Job
@@ -123,7 +123,7 @@ The chunk evaluation module:
 This setup runs the equivalent of:
 
 ```bash
-python -m s3_chunk_eval_upload \
+python -m synthetic_gen.data_processing.chunk_evaluation \
   --input_source "/workspace/satcom-synthetic-data-gen/data" \
   --input_type local \
   --prompt_template ./evaluators/prompts/ultraRM_prompt.yaml \
@@ -139,8 +139,9 @@ python -m s3_chunk_eval_upload \
 
 ```
 satcom-marenostrum/
-├── configs/slurm_jobs/chunk_evaluation      # Job configuration
-├── scripts/slurm/
+├── configs/slurm_jobs/evaluation/chunk/
+│   └── chunk_evaluation                     # Job configuration
+├── scripts/slurm/evaluation/chunk/
 │   ├── run_chunk_evaluation.sh              # Execution script
 │   └── submit_chunk_evaluation.sh           # Submission script
 ├── chunks/                                  # Output chunks (created automatically)
@@ -161,7 +162,7 @@ If you see "ERROR: UltraRM model not found in cache":
 
 ### Module Import Error
 
-If you see "ERROR: s3_chunk_eval_upload module not found":
+If you see "ERROR: chunk_evaluation module not found":
 
 1. Verify the container has the module installed
 2. Check that `PYTHONPATH` includes `/satcom-synthetic-data-gen`
@@ -180,9 +181,9 @@ If GPU is not being utilized:
 If scripts fail with syntax errors:
 
 ```bash
-sed -i 's/\r$//' configs/slurm_jobs/chunk_evaluation
-sed -i 's/\r$//' scripts/slurm/run_chunk_evaluation.sh
-sed -i 's/\r$//' scripts/slurm/submit_chunk_evaluation.sh
+sed -i 's/\r$//' configs/slurm_jobs/evaluation/chunk/chunk_evaluation
+sed -i 's/\r$//' scripts/slurm/evaluation/chunk/run_chunk_evaluation.sh
+sed -i 's/\r$//' scripts/slurm/evaluation/chunk/submit_chunk_evaluation.sh
 ```
 
 ## Notes

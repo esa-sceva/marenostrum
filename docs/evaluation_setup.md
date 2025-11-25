@@ -17,16 +17,16 @@ Evaluation jobs use large language models (LLM-as-judge) via vLLM to grade and s
 
 ## Files
 
-1. **Job Configuration**: `configs/slurm_jobs/evaluation`
-2. **Run Script**: `scripts/slurm/run_evaluation.sh`
-3. **Submission Script**: `scripts/slurm/submit_evaluation.sh`
+1. **Job Configuration**: `configs/slurm_jobs/evaluation/qa_curation/evaluation`
+2. **Run Script**: `scripts/slurm/evaluation/qa_curation/run_evaluation.sh`
+3. **Submission Script**: `scripts/slurm/evaluation/qa_curation/submit_evaluation.sh`
 
 ## Quick Start
 
 ### 1. Edit Configuration
 
 ```bash
-nano configs/slurm_jobs/evaluation
+nano configs/slurm_jobs/evaluation/qa_curation/evaluation
 ```
 
 Key parameters:
@@ -71,7 +71,7 @@ NUM_WORKERS="12"                            # Parallel workers
 ssh <hpc_username>@alogin2.bsc.es
 cd /gpfs/projects/<project_id>/satcom
 
-./scripts/slurm/submit_evaluation.sh configs/slurm_jobs/evaluation
+./scripts/slurm/evaluation/qa_curation/submit_evaluation.sh configs/slurm_jobs/evaluation/qa_curation/evaluation
 ```
 
 ### 3. Monitor Job
