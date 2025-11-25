@@ -33,11 +33,11 @@ Key parameters:
 
 ```bash
 # SLURM directives
-JOB_NAME=mdpi_17
+JOB_NAME=wikipedia
 WORK_DIR=.
-OUT_FILE=slurm_out_evaluation/mdpi_17_eval_%j.out
-ERR_FILE=slurm_out_evaluation/mdpi_17_eval_%j.err
-VLLM_LOG_FILE=slurm_out_evaluation/mdpi_17_eval_%j_vllm_server.log
+OUT_FILE=slurm_out_evaluation/wikipedia_eval_%j.out
+ERR_FILE=slurm_out_evaluation/wikipedia_eval_%j.err
+VLLM_LOG_FILE=slurm_out_evaluation/wikipedia_eval_%j_vllm_server.log
 NTASKS=1
 CPUS_PER_TASK=80
 TIME=12:00:00
@@ -49,9 +49,9 @@ QOS=acc_ehpc            # Use acc_debug for testing
 
 # Evaluation parameters
 MODEL_NAME="qwen2.5-72b"
-DATASET_PATH="/gpfs/projects/<project_id>/myfolder/results/qa_mdpi_17.jsonl"
-RESULTS_PATH="/gpfs/projects/<project_id>/myfolder/grades/qa_grades_mdpi_17.jsonl"
-OUTPUT_PATH="/gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_mdpi_17.jsonl"
+DATASET_PATH="/gpfs/projects/<project_id>/myfolder/results/qa_wikipedia.jsonl"
+RESULTS_PATH="/gpfs/projects/<project_id>/myfolder/grades/qa_grades_wikipedia.jsonl"
+OUTPUT_PATH="/gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_wikipedia.jsonl"
 PROMPT_PATH="/satcom-synthetic-data-gen/synthetic_gen/prompts/grade_qas.yaml"
 THRESHOLD="4"                               # Overall minimum score (1-5 scale)
 PERTINENCE_THRESHOLD="4"                    # Question relevance to context
@@ -140,23 +140,23 @@ The LLM-as-judge evaluates Q&A pairs on multiple dimensions (typically 1-5 scale
 
 The evaluation job generates:
 
-- **RESULTS_PATH**: All Q&A pairs with detailed scores for each dimension
-- **OUTPUT_PATH**: Filtered Q&A pairs that passed threshold criteria
-- **VLLM_LOG_FILE**: vLLM server logs
+- RESULTS_PATH: All Q&A pairs with detailed scores for each dimension
+- OUTPUT_PATH: Filtered Q&A pairs that passed threshold criteria
+- VLLM_LOG_FILE: vLLM server logs
 
 Example output structure:
 
 ```
 grades/
-└── qa_grades_mdpi_17.jsonl          # All Q&As with scores
+└── qa_grades_wikipedia.jsonl          # All Q&As with scores
 
 filtered_qas/
-└── filtered_qa_mdpi_17.jsonl        # High-quality Q&As only
+└── filtered_qa_wikipedia.jsonl        # High-quality Q&As only
 
 slurm_out_evaluation/
-├── mdpi_17_eval_<job_id>.out        # Job output log
-├── mdpi_17_eval_<job_id>.err        # Job error log
-└── mdpi_17_eval_<job_id>_vllm_server.log  # vLLM server log
+├── wikipedia_eval_<job_id>.out        # Job output log
+├── wikipedia_eval_<job_id>.err        # Job error log
+└── wikipedia_eval_<job_id>_vllm_server.log  # vLLM server log
 ```
 
 ## Output Format
@@ -226,16 +226,16 @@ Look for:
 
 ```bash
 # Count all graded pairs
-wc -l /gpfs/projects/<project_id>/myfolder/grades/qa_grades_mdpi_17.jsonl
+wc -l /gpfs/projects/<project_id>/myfolder/grades/qa_grades_wikipedia.jsonl
 
 # Count filtered (high-quality) pairs
-wc -l /gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_mdpi_17.jsonl
+wc -l /gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_wikipedia.jsonl
 
 # View sample graded pair
-head -1 /gpfs/projects/<project_id>/myfolder/grades/qa_grades_mdpi_17.jsonl | jq '.'
+head -1 /gpfs/projects/<project_id>/myfolder/grades/qa_grades_wikipedia.jsonl | jq '.'
 
 # Calculate filtering rate
-echo "scale=2; $(wc -l < filtered_qas/filtered_qa_mdpi_17.jsonl) * 100 / $(wc -l < grades/qa_grades_mdpi_17.jsonl)" | bc
+echo "scale=2; $(wc -l < filtered_qas/filtered_qa_wikipedia.jsonl) * 100 / $(wc -l < grades/qa_grades_wikipedia.jsonl)" | bc
 ```
 
 ## Troubleshooting
@@ -325,11 +325,11 @@ squeue -u <hpc_username>
 squeue -u <hpc_username>
 
 # 5. Check filtering statistics
-wc -l grades/qa_grades_mdpi_17.jsonl
-wc -l filtered_qas/filtered_qa_mdpi_17.jsonl
+wc -l grades/qa_grades_wikipedia.jsonl
+wc -l filtered_qas/filtered_qa_wikipedia.jsonl
 
 # 6. Upload filtered results
-rclone copy bsc:/gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_mdpi_17.jsonl \
+rclone copy bsc:/gpfs/projects/<project_id>/myfolder/filtered_qas/filtered_qa_wikipedia.jsonl \
   s3:<bucket-name>/synthetic-data-gen/approved/ --progress -vv
 ```
 
