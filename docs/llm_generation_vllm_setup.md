@@ -81,7 +81,7 @@ RESULTS_FILE="/gpfs/projects/<project_id>/myfolder/results/qa_output.jsonl"
 
 ```bash
 ssh <hpc_username>@alogin2.bsc.es
-cd /gpfs/projects/<project_id>/satcom
+cd /gpfs/projects/<project_id>/myfolder
 
 ./scripts/slurm/generation/llm/submit_vllm_generation.sh configs/slurm_jobs/generation/vllm_generation
 ```
