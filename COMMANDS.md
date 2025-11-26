@@ -14,7 +14,7 @@ ssh <hpc_username>@transfer1.bsc.es
 ssh <hpc_username>@alogin1.bsc.es
 
 # Working Directory
-cd /gpfs/projects/<project_id>/satcom
+cd /gpfs/projects/<project_id>/myfolder
 ```
 
 ## File Transfer
@@ -303,7 +303,7 @@ scp configs/slurm_jobs/my_job <hpc_username>@transfer1.bsc.es:/gpfs/projects/<pr
 
 # 3. SSH to login node
 ssh <hpc_username>@alogin2.bsc.es
-cd /gpfs/projects/<project_id>/satcom
+cd /gpfs/projects/<project_id>/myfolder
 
 # 4. Fix line endings if needed
 sed -i 's/\r$//' configs/slurm_jobs/my_job
