@@ -69,7 +69,7 @@ NUM_WORKERS="12"                            # Parallel workers
 
 ```bash
 ssh <hpc_username>@alogin2.bsc.es
-cd /gpfs/projects/<project_id>/satcom
+cd /gpfs/projects/<project_id>/myfolder
 
 ./scripts/slurm/evaluation/qa_curation/submit_evaluation.sh configs/slurm_jobs/evaluation/qa_curation/evaluation
 ```
