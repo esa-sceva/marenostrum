@@ -534,7 +534,7 @@ find /gpfs/projects/<project_id>/myfolder/ -name "config.json" | head -10
 - **Project**: <project_id>
 - **Transfer Node**: ssh <hpc_username>@transfer2.bsc.es
 - **Login Node**: ssh <hpc_username>@alogin2.bsc.es
-- **Working Directory**: /gpfs/projects/<project_id>/satcom
+- **Working Directory**: /gpfs/projects/<project_id>/myfolder
 
 **Important Notes:**
 - Use `transfer1.bsc.es` or `transfer2.bsc.es` for file transfers
@@ -565,5 +565,6 @@ find /gpfs/projects/<project_id>/myfolder/ -name "config.json" | head -10
 
 
 ---
+
 
 
