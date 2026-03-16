@@ -15,3 +15,6 @@ ModelBase.py
 llm_api.py
 LLMGenerator.py
 container_old.sif
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
